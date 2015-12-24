@@ -1,0 +1,34 @@
+Description:
+An advanced admin scaffold generator for Spree
+Creates a CRUD interface for whatever you want to use the Spree admin styling
+
+Example:
+    rails g spree:scaffold class_name name:string name2:string user_id:integer
+                                description:text image:image order_id:integer
+                                important:boolean task_date:datetime
+                                --search=name user_id important
+                                --locale=zh-TW:任務
+                                --fk=order:order_id user:user_id
+                                --presence name name2
+                                --unique name
+    This will create:
+	    app/models/class_name.rb
+	    app/controllers/admin/class_names_controller.rb
+	    app/views/admin/class_names/index.html.erb
+	    app/views/admin/class_names/new.html.erb
+	    app/views/admin/class_names/edit.html.erb
+	    app/views/admin/class_names/_form.html.erb
+	    app/views/admin/class_names/show.html.erb
+	    app/views/admin/class_names/index.pdf.erb
+	    app/views/admin/class_names/batch.pdf.erb
+	    app/views/admin/class_names/show.pdf.erb
+	    app/views/admin/class_names/_object.pdf.erb
+	    app/views/api/vi/class_names/index.v1.rabl
+	    app/views/api/vi/class_names/show.v1.rabl
+	    db/migrate/TIMESTAMP_create_class_names.rb
+        db/samples/class_names.rb
+        lib/class_names/class_name.rake
+	    config/locales/class_names.en.yml
+	    config/locales/class_names.zh-TW.yml
+	    config/locales/spree_scaffold.en.yml
+	    config/locales/spree_scaffold.zh-TW.yml

@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8'/>
+    <%%= wicked_pdf_stylesheet_link_tag 'spree/frontend/all' %>
+    <style>
+        .page-break {
+            display: block;
+            clear: both;
+            page-break-after: always;
+        }
+    </style>
+</head>
+<body>
+<div id="header">
+
+</div>
+<div id="content">
+    <%% @collection.each_with_index do |object, index| %>
+        <%%=render :partial => "object", :locals => {:object => object}%>
+        <%% if index != (@collection.length - 1) %>
+            <div class="page-break"></div>
+        <%% end %>
+    <%% end %>
+</div>
+<div id="footer">
+</div>
+</body>
+</html>

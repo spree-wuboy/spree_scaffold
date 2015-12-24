@@ -1,0 +1,12 @@
+<%=@locale%>:
+  spree:
+    scaffold:
+      none: none
+      say_yes: yes
+      say_no: no
+      say_true: yes
+      say_false: no
+      print: print
+      batch: batch
+      search_checked: "checked only:"
+      menu: "new functions"

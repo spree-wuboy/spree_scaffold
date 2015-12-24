@@ -1,0 +1,12 @@
+zh-TW:
+  spree:
+    scaffold:
+      none: 無
+      say_yes: 是
+      say_no: 否
+      say_true: 是
+      say_false: 否
+      print: 列表列印
+      batch: 批次列印
+      search_checked: "僅搜尋勾選項目:"
+      menu: "新增功能"

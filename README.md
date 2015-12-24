@@ -1,10 +1,20 @@
 SpreeScaffold
 =============
 
-An advanced admin scaffold generator for Spree.
+An advanced admin scaffold generator for Spree
+Creates a CRUD interface for whatever you want to use the Spree admin styling
 
-Creates a ready to use CRUD interface for your models inside Spree admin.
-Attachments, sorting and translations are supported.
+Support following functions:
+1.  Attachments
+2.  Search
+3   Sorting
+4.  locales
+5.  Ready to print pdf
+6.  Json api
+7.  Foreign key data selection 
+8.  Translations
+9.  Basic validation
+10. Sample data seeding
 
 Installation
 ============
@@ -12,7 +22,7 @@ Installation
 Add this line to your application's Gemfile:
 ```ruby
 group :development do
-  gem 'spree_scaffold', github: 'freego/spree_scaffold', branch: 'X-X-stable'
+  gem 'spree_scaffold', github: 'wuboy0307/spree_scaffold', branch: 'X-X-stable'
 end
 ```
 
@@ -23,9 +33,16 @@ And then execute:
 Usage
 =====
 
-Generate a scaffold for the new `Brand` model:
+Generate a scaffold for the new `Task` model:
 
-    $ rails generate spree_scaffold:scaffold Brand name:string description:text position:integer ... [--i18n name description]
+    $  rails g spree:scaffold class_name name:string slug:string user_id:integer
+                                      description:text image:image order_id:integer
+                                      important:boolean task_date:datetime
+                                      [--search=name user_id important]
+                                      [--locale=zh-TW:任務]
+                                      [--fk=order:order_id user:user_id]
+                                      [--presence name]
+                                      [--unique name]
 
 And adjust the [glyphicons](http://glyphicons.com/) icon name on the `app/overrides/spree/admin/add_spree_...` file.
 
@@ -38,17 +55,26 @@ Some more magic:
 
 Example output:
 
-    create  app/models/spree/brand.rb
-    create  app/controllers/spree/admin/brands_controller.rb
-    create  app/views/spree/admin/brands/index.html.erb
-    create  app/views/spree/admin/brands/new.html.erb
-    create  app/views/spree/admin/brands/edit.html.erb
-    create  app/views/spree/admin/brands/_form.html.erb
-    create  db/migrate/20140412175904_create_spree_brands.rb
-    create  config/locales/en_brands.yml
-    create  config/locales/it_brands.yml
-    create  app/overrides/spree/admin/add_spree_brands_to_admin_menu.rb
-    append  config/routes.rb
+	    app/models/class_name.rb
+	    app/controllers/admin/class_names_controller.rb
+	    app/views/admin/class_names/index.html.erb
+	    app/views/admin/class_names/new.html.erb
+	    app/views/admin/class_names/edit.html.erb
+	    app/views/admin/class_names/_form.html.erb
+	    app/views/admin/class_names/show.html.erb
+	    app/views/admin/class_names/index.pdf.erb
+	    app/views/admin/class_names/batch.pdf.erb
+	    app/views/admin/class_names/show.pdf.erb
+	    app/views/admin/class_names/_object.pdf.erb
+	    app/views/api/vi/class_names/index.v1.rabl
+	    app/views/api/vi/class_names/show.v1.rabl
+	    db/migrate/TIMESTAMP_create_class_names.rb
+        db/samples/class_names.rb
+        lib/class_names/class_name.rake
+	    config/locales/class_names.en.yml
+	    config/locales/class_names.zh-TW.yml
+	    config/locales/spree_scaffold.en.yml
+	    config/locales/spree_scaffold.zh-TW.yml
 
 Then run the migration:
 
@@ -59,4 +85,4 @@ To rollback:
     $ rake db:rollback
     $ rails destroy spree_scaffold:scaffold Brand name:string description:text position:integer ...
 
-Copyright (c) 2015 sebastyuiop, alepore, released under the New BSD License
+Copyright (c) 2015 Ernest Wu, released under the New BSD License

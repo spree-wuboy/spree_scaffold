@@ -1,0 +1,37 @@
+zh-TW:
+  spree:
+    admin:
+      tab:
+        <%= plural_name %>: "<%= @name || class_name.pluralize.titleize %>"
+    new_<%= singular_name %>: "新增<%= @name || class_name.titleize %>"
+    listing_<%= plural_name %>: "<%= @name || class_name.pluralize.titleize %>列表"
+    editing_<%= singular_name %>: "編輯<%= @name || class_name.titleize %>"
+  activerecord:
+    models:
+      spree/<%= singular_name %>: "<%= @name || singular_name %>"
+    errors:
+      models:
+        spree/<%= singular_name %>:
+<% unless options[:presence].any? -%>
+          blank: "不可為空"
+<% else -%>
+          attributes:
+<% options[:presence].each do |p| -%>
+            <%=p%>:
+              blank: "不可為空"
+<% end -%>
+<% end -%>
+<% unless options[:unique].any? -%>
+          uniqueness: "不可重複"
+<% else -%>
+          attributes:
+<% options[:unique].each do |p| -%>
+            <%=p%>:
+              uniqueness: "不可重複"
+<% end -%>
+<% end -%>
+    attributes:
+      spree/<%= singular_name %>:
+<% attributes.each do |attribute| -%>
+        <%= attribute.name %>: "<%= attribute.name.titleize %><%=attribute.type == :boolean ? '?' : ''%>"
+<% end -%>

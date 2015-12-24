@@ -1,0 +1,37 @@
+<%=@locale%>:
+  spree:
+    admin:
+      tab:
+        <%= plural_name %>: "<%= @name || class_name.pluralize.titleize %>"
+    new_<%= singular_name %>: "New <%= @name || class_name.titleize %>"
+    listing_<%= plural_name %>: "Listing <%= @name || class_name.pluralize.titleize %>"
+    editing_<%= singular_name %>: "Editing <%= @name || class_name.titleize %>"
+  activerecord:
+    models:
+      spree/<%= singular_name %>: "<%= @name || singular_name %>"
+    errors:
+      models:
+        spree/<%= singular_name %>:
+<% unless options[:presence].any? -%>
+          blank: "can't not be blank!"
+<% else -%>
+          attributes:
+<% options[:presence].each do |p| -%>
+            <%=p%>:
+              blank: "can't not be blank!"
+<% end -%>
+<% end -%>
+<% unless options[:unique].any? -%>
+          uniqueness: "must be unique!"
+<% else -%>
+          attributes:
+<% options[:unique].each do |p| -%>
+            <%=p%>:
+              uniqueness: "must be unique!"
+<% end -%>
+<% end -%>
+    attributes:
+      spree/<%= singular_name %>:
+<% attributes.each do |attribute| -%>
+        <%= attribute.name %>: "<%= attribute.name.titleize %><%=attribute.type == :boolean ? '?' : ''%>"
+<% end -%>

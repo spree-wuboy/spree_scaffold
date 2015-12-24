@@ -2,8 +2,12 @@
   <%%= Spree.t(:new_<%= singular_name %>) %>
 <%% end %>
 
+<%% content_for :page_actions do %>
+  <%%= button_link_to Spree.t(:back_to_resources_list), collection_url, :icon => 'arrow-left' %>
+<%% end %>
+
 <div data-hook="admin_<%= singular_name %>_new_form_header">
-  <%%= render 'spree/shared/error_messages', target: @<%= singular_name %> %>
+  <%%= render :partial => 'spree/admin/shared/error_messages', :locals => { :target => @<%= singular_name %> } %>
 </div>
 
 <div data-hook="admin_<%= singular_name %>_new_form">

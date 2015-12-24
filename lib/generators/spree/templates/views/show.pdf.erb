@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8'/>
+    <%%= wicked_pdf_stylesheet_link_tag 'spree/frontend/all' %>
+</head>
+<body>
+<div id="header">
+</div>
+<div id="content">
+    <%%=render :partial => "object", :locals => {:object => @object}%>
+</div>
+<div id="footer">
+</div>
+</body>
+</html>
