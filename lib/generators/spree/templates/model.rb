@@ -2,7 +2,6 @@ module Spree
   class <%= class_name %> < Spree::Base
 <% if sortable? -%>
     acts_as_list
-
 <% end -%>
 <% if slugged? -%>
     extend FriendlyId
@@ -28,7 +27,8 @@ module Spree
     has_attached_file :<%= attribute.name %>,
                       url: '/spree/<%= plural_name %>/:id/:basename.:extension',
                       path: ':rails_root/public/spree/<%= plural_name %>/:id/:basename.:extension'
-
+<% elsif options[:enum].keys.include?(attribute.name) -%>
+    enum <%=attribute.name%>: [<%=options[:enum][attribute.name].split(",").map{|v| ":#{v}"}.join(", ")%>]
 <% end -%>
 <% end -%>
 <% if sortable? -%>
@@ -45,7 +45,7 @@ module Spree
     # please add has_many <%=plural_name%> to <%=ref%> table
 <% end -%>
     self.whitelisted_ransackable_associations = %w[<%=options[:fk].keys.join(" ")%>]
-    self.whitelisted_ransackable_attributes = %w[<%=options[:search].join(" ")%>]
+    self.whitelisted_ransackable_attributes = %w[<%=options[:search].join(" ")%> <%=options[:skip_timestamps] ? "" : "created_at updated_at"%>]
 
 <% if options[:presence].any? -%>
     validates_presence_of <%= options[:presence].map{|p| ":#{p}"}.join(", ") -%>

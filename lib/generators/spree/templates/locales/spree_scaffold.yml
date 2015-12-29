@@ -1,5 +1,6 @@
 <%=@locale%>:
   spree:
+    updated_at: "updated at"
     scaffold:
       none: none
       say_yes: yes

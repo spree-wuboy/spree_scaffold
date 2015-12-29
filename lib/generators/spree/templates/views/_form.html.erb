@@ -8,8 +8,10 @@
     <% fk_class_name = "Spree::#{options[:fk].invert[attribute.name].camelcase}" -%>
       <%% if defined?(<%=fk_class_name%>) %>
           <%%= f.label :<%= attribute.name %> %>
-          <%%= f.select :<%= attribute.name %>, options_for_select(@select_<%=attribute.name%>.map { |s| ["override this #{s.id}", s.id] }, f.object.<%=attribute.name%>), {}, {class: 'form-control'} %>
+          <%%= f.select :<%= attribute.name %>, options_for_select(@select_<%=attribute.name%>.map { |s| ["override this <%=attribute.name%> #{s.id}", s.id] }, f.object.<%=attribute.name%>), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
       <%% end %>
+<% elsif options[:enum].keys.include?(attribute.name) -%>
+    <%%= f.select :<%= attribute.name %>, options_for_select(Spree::<%=class_name%>.<%=attribute.name.pluralize%>.keys.to_a), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
 <% elsif attribute.type == :image || attribute.type == :file -%>
       <%%= f.label :<%= attribute.name %> %>
       <%%= f.file_field :<%= attribute.name %>, class: 'form-control' %>

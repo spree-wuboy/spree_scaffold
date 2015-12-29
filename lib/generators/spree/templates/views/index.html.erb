@@ -17,15 +17,37 @@
 <% search_first = true -%>
 <% options[:search].each do |column| -%>
 <% attribute = attributes.select{|a| a.name == column}.first -%>
-<% if attribute && attribute.type != :image && attribute.type != :file -%>
+<% if attribute.type == :datetime -%>
+        <div class="date-range-filter col-md-8">
+          <div class="form-group">
+            <%%= label_tag :<%=attribute.name%>_range, "#{I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>")}#{Spree.t(:date_range)}" %>
+            <div class="row no-padding-bottom">
+              <div class="col-md-6">
+                <div class="input-group">
+                  <%%= f.text_field :<%=attribute.name%>_gt, :class => 'datepicker datepicker-from form-control', :value => params[:q][:<%=attribute.name%>_gt], :placeholder => Spree.t(:start) %>
+                  <span class="input-group-addon"><i class="icon icon-calendar"></i></span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="input-group">
+                  <%%= f.text_field :<%=attribute.name%>_lt, :class => 'datepicker datepicker-to form-control', :value => params[:q][:<%=attribute.name%>_lt], :placeholder => Spree.t(:stop) %>
+                  <span class="input-group-addon"><i class="icon icon-calendar"></i></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<% elsif attribute && attribute.type != :image && attribute.type != :file -%>
           <div class="col-md-6">
             <div class="form-group">
-              <%%= f.label :<%=column%> %>
+                  <%%= f.label :<%=column%> %>
   <% if options[:fk].values.include?(column) -%>
-                  <% fk_class_name = "Spree::#{options[:fk].invert[column].camelcase}" -%>
+                <%- fk_class_name = "Spree::#{options[:fk].invert[column].camelcase}" -%>
                   <%% if defined?(<%=fk_class_name%>) %>
-                    <%%= f.select :<%= column %>, options_for_select(@search_<%=column%>.map { |s| ["override this #{s.id}", s.id] }, f.object.<%=column%>), {}, {class: 'form-control'} %>
+                    <%%= f.select :<%= column %>_eq, options_for_select(@search_<%=column%>.map { |s| ["override this <%=column%> #{s.id}", s.id] }, f.object.<%=column%>), {include_blank: true}, {class: 'form-control'} %>
                   <%% end %>
+  <% elsif options[:enum].keys.include?(column) -%>
+                  <%%= f.select :<%= column %>_eq, options_for_select(Spree::<%=class_name%>.<%=column.pluralize%>), {include_blank: true}, {class: 'form-control'} %>
   <% elsif attribute.type == :boolean -%>
                   <%%=Spree.t("scaffold.none")%>: <%%= f.radio_button :<%=column%>_eq, -1, :checked => (params[:q][:<%=column%>_eq]=='-1') %>&nbsp;&nbsp;
                   <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%=column%>_eq, 1, :checked => params[:q][:<%=column%>_eq] == '1' %>&nbsp;&nbsp;
@@ -36,6 +58,29 @@
   <% end -%>
             </div>
           </div>
+<% end -%>
+<% end -%>
+<% unless options[:skip_timestamps] -%>
+<% ["created_at", "updated_at"].each do |date_name| -%>
+              <div class="date-range-filter col-md-8">
+                <div class="form-group">
+                  <%%= label_tag :<%=date_name%>_range, "#{Spree.t(:<%=date_name%>)}#{Spree.t(:date_range)}" %>
+                  <div class="row no-padding-bottom">
+                    <div class="col-md-6">
+                      <div class="input-group">
+                        <%%= f.text_field :<%=date_name%>_gt, :class => 'datepicker datepicker-from form-control', :value => params[:q][:<%=date_name%>_gt], :placeholder => Spree.t(:start) %>
+                        <span class="input-group-addon"><i class="icon icon-calendar"></i></span>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="input-group">
+                        <%%= f.text_field :<%=date_name%>_lt, :class => 'datepicker datepicker-to form-control', :value => params[:q][:<%=date_name%>_lt], :placeholder => Spree.t(:stop) %>
+                        <span class="input-group-addon"><i class="icon icon-calendar"></i></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 <% end -%>
 <% end -%>
           <div class="col-md-6">

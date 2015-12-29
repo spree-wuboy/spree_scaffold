@@ -9,6 +9,7 @@ module Spree
 
       argument :attributes, type: :array, default: [], banner: 'field:type field:type'
       class_option :locale, type: :hash, default: {}, required: false, desc: 'additional locale (locale:translation_name)'
+      class_option :enum, type: :hash, default: {}, required: false, desc: 'enum fields (enum:value1,value2,value3)'
       class_option :fk, type: :hash, default: {}, required: false, desc: 'foreign key (reference:fk_id)'
       class_option :search, type: :array, default: [], required: false, desc: 'search/index fields'
       class_option :i18n, type: :array, default: [], required: false, desc: 'translated fields'

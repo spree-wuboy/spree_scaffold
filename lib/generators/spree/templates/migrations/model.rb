@@ -11,11 +11,11 @@ class CreateSpree<%= class_name.pluralize %> < ActiveRecord::Migration
     end
 
 <% options[:search].each do |column| -%>
-    add_index :spree_<%= table_name %>, :<%=column%>
+    add_index :spree_<%= table_name %>, :<%=column%> <%=options[:unique].include?(column) ? ", unique: true" : ""%>
 <% end -%>
 <% options[:fk].each do |ref, fk_id| -%>
 <% unless options[:search].include?(fk_id) -%>
-    add_index :spree_<%= table_name %>, :<%=fk_id%>
+    add_index :spree_<%= table_name %>, :<%=fk_id%> <%=options[:unique].include?(fk_id) ? ", unique: true" : ""%>
 <% end -%>
 <% end -%>
 <% attributes.each do |attribute| -%>

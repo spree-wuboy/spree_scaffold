@@ -18,6 +18,8 @@ require 'faker'
 <% fk_name = options[:fk].invert[attribute.name] -%>
 <% fk_class_name = "Spree::#{options[:fk].invert[attribute.name].camelcase}" -%>
         <%=fk_name%>: <%=fk_class_name%>.offset(rand(<%=fk_name%>_count)).first,
+<% elsif options[:enum].keys.include?(attribute.name) -%>
+        <%=attribute.name%>: Random.rand(<%=options[:enum][attribute.name].split(",").size%>),
 <% elsif attribute.type == :string -%>
 <% if attribute.name.include?("name") -%>
         <%=attribute.name%>: Faker::Name.name,
@@ -26,6 +28,10 @@ require 'faker'
 <% end -%>
 <% elsif attribute.type == :datetime -%>
         <%=attribute.name%>: Faker::Time.between(Time.now - 100.days, Time.now - 50.days),
+<% elsif attribute.type == :integer -%>
+        <%=attribute.name%>: Random.rand(100),
+<% elsif attribute.type == :float -%>
+    <%=attribute.name%>: Random.rand(100.0).round(2),
 <% elsif attribute.type == :boolean -%>
         <%=attribute.name%>: [true, false].sample,
 <% end -%>

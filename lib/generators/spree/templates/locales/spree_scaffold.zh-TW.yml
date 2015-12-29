@@ -1,5 +1,6 @@
 zh-TW:
   spree:
+    updated_at: "更新於"
     scaffold:
       none: 無
       say_yes: 是
