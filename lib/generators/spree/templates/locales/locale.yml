@@ -34,4 +34,10 @@
       spree/<%= singular_name %>:
 <% attributes.each do |attribute| -%>
         <%= attribute.name %>: "<%= attribute.name.titleize %><%=attribute.type == :boolean ? '?' : ''%>"
+<%- if options[:enum].keys.include?(attribute.name) -%>
+        <%= attribute.name.pluralize %>:
+<% options[:enum][attribute.name].split(",").each do |enum| -%>
+          <%=enum%>: <%=enum%>
+<% end -%>
+<%- end -%>
 <% end -%>

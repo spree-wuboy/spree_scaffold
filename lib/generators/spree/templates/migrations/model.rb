@@ -3,21 +3,19 @@ class CreateSpree<%= class_name.pluralize %> < ActiveRecord::Migration
     create_table :spree_<%= table_name %> do |t|
 <% attributes.each do |attribute| -%>
 <% next if attribute.type == :image || attribute.type == :file -%>
-      t.<%= attribute.type %> :<%= attribute.name %>
+      t.<%= attribute.type %> :<%= attribute.name %> <%= options[:default].keys.include?(attribute.name) ? ", default: #{(attribute.type == :boolean || attribute.type == :integer) ? options[:default][attribute.name] : "'#{options[:default][attribute.name]}'"}" : ""%>
 <% end -%>
 <% unless options[:skip_timestamps] -%>
       t.timestamps
 <% end -%>
     end
 
-<% options[:search].each do |column| -%>
-    add_index :spree_<%= table_name %>, :<%=column%> <%=options[:unique].include?(column) ? ", unique: true" : ""%>
+<% attributes.each do |attribute| -%>
+  <%- if attribute.name == "deleted_at" || options[:fk].values.include?(attribute.name) || options[:search].include?(attribute.name) -%>
+    add_index :spree_<%= table_name %>, :<%=attribute.name%> <%=options[:unique].include?(attribute.name) ? ", unique: true" : ""%>
+  <%- end -%>
 <% end -%>
-<% options[:fk].each do |ref, fk_id| -%>
-<% unless options[:search].include?(fk_id) -%>
-    add_index :spree_<%= table_name %>, :<%=fk_id%> <%=options[:unique].include?(fk_id) ? ", unique: true" : ""%>
-<% end -%>
-<% end -%>
+
 <% attributes.each do |attribute| -%>
 <% if attribute.type == :image || attribute.type == :file -%>
     add_attachment :spree_<%= table_name %>, :<%= attribute.name %>

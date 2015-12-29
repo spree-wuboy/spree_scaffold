@@ -55,10 +55,11 @@ module Spree
         session[:ids] ||= []
         if params[:checked] == "true"
           session[:ids].push(params[:id].to_i)
+          render :nothing => true
         else
           session[:ids].delete(params[:id].to_i)
+          render :js => "document.getElementById('check_all').checked = false"
         end
-        render :nothing => true
       end
 
       def collection

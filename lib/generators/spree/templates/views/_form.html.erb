@@ -1,29 +1,30 @@
 <div data-hook="admin_<%= singular_name %>_form_fields" class="row">
-  <div class="col-md-6">
 <% attributes.each do |attribute| -%>
-<% next if attribute.name == 'position' && attribute.type == :integer -%>
-<% next if attribute.name == 'slug' -%>
+<% next if (attribute.name == 'position' && attribute.type == :integer) || attribute.name == 'slug' || attribute.name == 'deleted_at' -%>
+  <div class="col-md-6">
     <%%= f.field_container :<%= attribute.name %>, class: ['form-group'] do %>
 <% if options[:fk].values.include?(attribute.name) -%>
     <% fk_class_name = "Spree::#{options[:fk].invert[attribute.name].camelcase}" -%>
       <%% if defined?(<%=fk_class_name%>) %>
-          <%%= f.label :<%= attribute.name %> %>
+          <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
           <%%= f.select :<%= attribute.name %>, options_for_select(@select_<%=attribute.name%>.map { |s| ["override this <%=attribute.name%> #{s.id}", s.id] }, f.object.<%=attribute.name%>), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
       <%% end %>
 <% elsif options[:enum].keys.include?(attribute.name) -%>
-    <%%= f.select :<%= attribute.name %>, options_for_select(Spree::<%=class_name%>.<%=attribute.name.pluralize%>.keys.to_a), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
+    <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+    <%%= f.select :<%= attribute.name %>, options_for_select(Spree::<%=class_name%>.<%=attribute.name.pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name.pluralize%>.#{k}"), k]}, f.object.<%=attribute.name%>), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
 <% elsif attribute.type == :image || attribute.type == :file -%>
-      <%%= f.label :<%= attribute.name %> %>
+      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
       <%%= f.file_field :<%= attribute.name %>, class: 'form-control' %>
 <% elsif attribute.type == :boolean -%>
-      <%%= f.<%= attribute.field_type %> :<%= attribute.name %> %>
-      <%%= f.label :<%= attribute.name %> %>
+      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+      <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%=attribute.name%>, 1, :checked => f.object.<%= attribute.name %> == true %>&nbsp;&nbsp;
+      <%%=Spree.t("scaffold.say_no")%>: <%%= f.radio_button :<%=attribute.name%>, 0, :checked => f.object.<%= attribute.name %> == false %>&nbsp;&nbsp;
 <% elsif attribute.type == :datetime -%>
-      <%%= f.label :<%= attribute.name %> %>
+      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
       <%%= f.text_field :<%= attribute.name %>, value: datepicker_field_value(f.object.<%= attribute.name %>), class: 'datepicker form-control' %>
 <% else -%>
-      <%%= f.label :<%= attribute.name %> %>
-      <%%= f.<%= attribute.field_type %> :<%= attribute.name %>, class: 'form-control' %>
+      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+      <%%= f.text_field :<%= attribute.name %>,  class: 'form-control' %>
 <% end -%>
       <%%= error_message_on :<%= singular_name %>, :<%= attribute.name %> %>
 <% if attribute.type == :image -%>
@@ -38,7 +39,6 @@
       <%% end %>
 <% end -%>
     <%% end %>
-
-<% end -%>
   </div>
+<% end -%>
 </div>

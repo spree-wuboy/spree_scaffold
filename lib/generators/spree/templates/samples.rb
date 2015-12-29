@@ -26,7 +26,7 @@ require 'faker'
 <% elsif attribute.name != "slug" -%>
         <%=attribute.name%>: Faker::Lorem.word,
 <% end -%>
-<% elsif attribute.type == :datetime -%>
+<% elsif attribute.type == :datetime && attribute.name != "deleted_at"-%>
         <%=attribute.name%>: Faker::Time.between(Time.now - 100.days, Time.now - 50.days),
 <% elsif attribute.type == :integer -%>
         <%=attribute.name%>: Random.rand(100),

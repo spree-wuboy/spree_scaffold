@@ -2,31 +2,37 @@
   <legend><%%= I18n.t("activerecord.models.spree/<%=singular_name%>") %></legend>
   <div data-hook="admin_<%= singular_name %>_show_fields" class="row">
     <div class="col-md-6">
-      <% attributes.each do |attribute| -%>
-          <% next if attribute.name == 'position' && attribute.type == :integer -%>
-          <% next if attribute.name == 'slug' -%>
+      <%- attributes.each do |attribute| -%>
+          <%- next if (attribute.name == 'position' && attribute.type == :integer) || attribute.name == 'slug' || attribute.name == 'deleted_at' -%>
           <%%= content_tag :div, class: ['form-group'] do %>
-          <% if options[:fk].values.include?(attribute.name) -%>
-              <% fk_name = options[:fk].invert[attribute.name] -%>
+          <%- if options[:enum].include?(attribute.name) -%>
+              <%%= label_tag :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+              <%%= content_tag(:div, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name.pluralize%>.#{object.<%=attribute.name%>}"))%>
+          <%- elsif options[:fk].values.include?(attribute.name) -%>
+              <%- fk_name = options[:fk].invert[attribute.name] -%>
               <%% if object.<%=fk_name%>.present? %>
-              <%%= label_tag :<%= attribute.name %> %>
-              <%%= content_tag(:div, "override this #{object.<%=fk_name%>}")%>
+                <%%= label_tag :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+                <%%= content_tag(:div, "override this #{object.<%=fk_name%>}")%>
               <%% end %>
-          <% elsif attribute.type == :image || attribute.type == :file -%>
-              <%%= label_tag :<%= attribute.name %> %>
-              <% if attribute.type == :image -%>
+          <%- elsif attribute.type == :boolean -%>
+              <%%= label_tag :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+              <%%= content_tag(:div, Spree.t("scaffold.say_#{object.<%= attribute.name %>}"))%>
+          <%- elsif attribute.type == :image || attribute.type == :file -%>
+              <%%= label_tag :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+              <%- if attribute.type == :image -%>
                   <%% if object.<%= attribute.name %>_file_name %>
-                  <div>
-                    <%%= wicked_pdf_image_tag object.<%= attribute.name %>.url -%>
-                  </div>
+                    <div><%%= wicked_pdf_image_tag object.<%= attribute.name %>.url(:large) -%></div>
                   <%% end %>
-              <% end -%>
-          <% else -%>
-              <%%= label_tag :<%= attribute.name %> %>
+              <%- end -%>
+          <%- elsif attribute.type == :datetime -%>
+              <%%= label_tag :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+              <%%= content_tag(:div, l(object.<%=attribute.name %>)) if object.<%=attribute.name %>.present?%>
+          <%- elsif attribute.type != :text  -%>
+              <%%= label_tag :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
               <%%= content_tag(:div, object.<%=attribute.name %>)%>
-          <% end -%>
+          <%- end -%>
           <%% end %>
-      <% end -%>
+      <%- end -%>
     </div>
   </div>
 </fieldset>

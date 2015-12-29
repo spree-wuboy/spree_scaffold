@@ -19,22 +19,24 @@
   <table class="table" id="listing_<%= plural_name %>" data-hook>
     <thead>
     <tr data-hook="admin_<%= plural_name %>_index_headers">
-      <% attributes.each do |attribute| -%>
-          <% if (attribute.type == :string && attribute.name != "slug") || attribute.type == :boolean || (attribute.type == :integer && !(options[:fk].values.include?(attribute.name))) || attribute.type == :datetime  -%>
-              <th><%%= t(:<%= attribute.name %>, scope: 'activerecord.attributes.spree/<%= singular_name %>') %></th>
-          <% end -%>
-      <% end -%>
+      <%- attributes.each do |attribute| -%>
+      <%- if (attribute.type == :string && attribute.name != "slug") || attribute.type == :boolean || (attribute.type == :integer && !(options[:fk].values.include?(attribute.name))) || attribute.type == :datetime  -%>
+          <th><%%= t(:<%= attribute.name %>, scope: 'activerecord.attributes.spree/<%= singular_name %>') %></th>
+      <%- end -%>
+      <%- end -%>
     </tr>
     </thead>
     <tbody>
     <%% @<%= plural_name %>.each do |<%= singular_name %>| %>
     <tr id="<%%= spree_dom_id <%= singular_name %> %>" data-hook="admin_<%= plural_name %>_index_rows" class="<%%= cycle('odd', 'even')%>">
       <% attributes.each do |attribute| -%>
-          <% if (attribute.type == :string && attribute.name != "slug") || (attribute.type == :integer && !(options[:fk].values.include?(attribute.name))) -%>
+          <% if options[:enum].include?(attribute.name) -%>
+              <td><%%=I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name.pluralize%>.#{<%=singular_name%>.<%=attribute.name%>}")%></td>
+          <% elsif (attribute.type == :string && attribute.name != "slug") || (attribute.type == :integer && !(options[:fk].values.include?(attribute.name))) -%>
               <td><%%= <%= singular_name %>.<%= attribute.name %>.to_s %></td>
-          <% elsif attribute.type == :boolean %>
+          <% elsif attribute.type == :boolean -%>
               <td><%%= Spree.t("scaffold.say_#{<%= singular_name %>.<%= attribute.name %>}") %></td>
-          <% elsif attribute.type == :datetime %>
+          <% elsif attribute.type == :datetime -%>
               <td><%%= l(<%= singular_name %>.<%= attribute.name %>) if <%= singular_name %>.<%= attribute.name %> %></td>
           <% end -%>
       <% end -%>

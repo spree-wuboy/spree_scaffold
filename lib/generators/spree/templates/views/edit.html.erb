@@ -1,8 +1,14 @@
+<%% content_for :title do %>
+  <%%= "Spree #{Spree.t('administration')}: " %>
+  <%%= I18n.t("activerecord.models.spree/<%=singular_name%>") %>
+<%% end %>
+
 <%% content_for :page_title do %>
   <%%= Spree.t(:editing_<%= singular_name %>) %>
 <%% end %>
 
 <%% content_for :page_actions do %>
+    <%%= button_link_to(Spree.t("scaffold.print"), object_url(@object, :pdf), :icon => 'print', :target => "_blank", :class => "btn btn-primary") %>
     <%%= button_link_to Spree.t(:back_to_resources_list), collection_url, :icon => 'arrow-left' %>
 <%% end %>
 

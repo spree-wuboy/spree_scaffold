@@ -8,9 +8,10 @@ module Spree
       source_root File.expand_path('../../templates', __FILE__)
 
       argument :attributes, type: :array, default: [], banner: 'field:type field:type'
-      class_option :locale, type: :hash, default: {}, required: false, desc: 'additional locale (locale:translation_name)'
+      class_option :locale, type: :hash, default: {}, required: false, desc: 'additional locale (locale:name locale:name)'
       class_option :enum, type: :hash, default: {}, required: false, desc: 'enum fields (enum:value1,value2,value3)'
-      class_option :fk, type: :hash, default: {}, required: false, desc: 'foreign key (reference:fk_id)'
+      class_option :default, type: :hash, default: {}, required: false, desc: 'default fields (field:value field:value)'
+      class_option :fk, type: :hash, default: {}, required: false, desc: 'foreign key (fk_name:fk_id fk_name:fk_id)'
       class_option :search, type: :array, default: [], required: false, desc: 'search/index fields'
       class_option :i18n, type: :array, default: [], required: false, desc: 'translated fields'
       class_option :skip_timestamps, type: :boolean, default: false, required: false, desc: 'skip timestamps'
@@ -23,6 +24,10 @@ module Spree
         else
           @prev_migration_nr = Time.now.utc.strftime("%Y%m%d%H%M%S").to_i
         end
+      end
+
+      def validate_name
+        raise "name is invalid: '#{singular_name}'" if singular_name.include?(":")
       end
 
       def create_model
