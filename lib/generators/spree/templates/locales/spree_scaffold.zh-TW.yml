@@ -11,3 +11,5 @@ zh-TW:
       batch: 批次列印
       search_checked: "僅搜尋勾選項目:"
       menu: "新增功能"
+      add_sub_item: "新增子項目"
+      back_to_resources_list: "回列表"

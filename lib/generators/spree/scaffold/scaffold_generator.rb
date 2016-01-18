@@ -17,6 +17,7 @@ module Spree
       class_option :skip_timestamps, type: :boolean, default: false, required: false, desc: 'skip timestamps'
       class_option :presence, type: :array, default: [], required: false, desc: 'validate presence'
       class_option :unique, type: :array, default: [], required: false, desc: 'validate uniqueness'
+      class_option :nested, type: :array, default: [], required: false, desc: 'nested attributes(comments, ingredients), you must make sure log/scaffold.log already have the class'
 
       def self.next_migration_number(path)
         if @prev_migration_nr
@@ -35,6 +36,7 @@ module Spree
       end
 
       def create_controller
+        create_nested
         template 'controller.rb', "app/controllers/spree/admin/#{plural_name}_controller.rb"
       end
 
@@ -43,6 +45,7 @@ module Spree
       end
 
       def create_views
+        create_nested
         %w[index new edit _form show].each do |view|
           template "views/#{view}.html.erb", "app/views/spree/admin/#{plural_name}/#{view}.html.erb"
         end
@@ -70,9 +73,10 @@ module Spree
         template "task.rake", "lib/tasks/#{singular_name}.rake"
       end
 
-      def create_initializers
+      def create_logs
         log_path = "log/scaffold.log"
         create_file log_path unless File.exist?(File.join(destination_root, log_path))
+        gsub_file log_path, /rails g spree:scaffold #{name}.*\n/, ""
         append_file log_path, "rails g spree:scaffold #{name} #{attributes.map{|a| "#{a.name}:#{a.type}"}.join(" ")} #{options.map{|o,v| v.present? ? "--#{o}=#{v.is_a?(Array) ? v.join(" ") : v.is_a?(Hash) ? v.map{|k1,v1| "#{k1}:#{v1}"}.join(" ") : v}" : ''}.join(" ")}\n".force_encoding("ASCII-8BIT")
       end
 
@@ -129,6 +133,19 @@ module Spree
       end
 
       private
+
+      def create_nested
+        log_path = "log/scaffold.log"
+        @nested_hash = {}
+        File.readlines(log_path).each do |line|
+          options[:nested].each do |nested|
+            if line.include?("rails g spree:scaffold #{nested.singularize}")
+              puts("nested=#{nested}, attributes=#{line.gsub(("rails g spree:scaffold #{nested.singularize}"), "").gsub(/--.*/, "").split(" ").map{|s| {:name => s.split(":")[0], :type => s.split(":")[1].to_sym}}}")
+              @nested_hash[nested] = line.gsub(("rails g spree:scaffold #{nested.singularize}"), "").gsub(/--.*/, "").split(" ").map{|s| {:name => s.split(":")[0], :type => s.split(":")[1].to_sym}}
+            end
+          end
+        end
+      end
 
       def routes_text
         <<-EOS

@@ -41,3 +41,6 @@ zh-TW:
 <% end -%>
 <%- end -%>
 <% end -%>
+<% options[:nested].each do |nested| -%>
+        <%=nested%>: '<%=nested%>'
+<% end -%>

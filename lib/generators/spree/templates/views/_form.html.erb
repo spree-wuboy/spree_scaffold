@@ -1,44 +1,177 @@
-<div data-hook="admin_<%= singular_name %>_form_fields" class="row">
+<div data-hook="admin_<%= singular_name %>_form_fields">
 <% attributes.each do |attribute| -%>
 <% next if (attribute.name == 'position' && attribute.type == :integer) || attribute.name == 'slug' || attribute.name == 'deleted_at' -%>
-  <div class="col-md-6">
-    <%%= f.field_container :<%= attribute.name %>, class: ['form-group'] do %>
-<% if options[:fk].values.include?(attribute.name) -%>
-    <% fk_class_name = "Spree::#{options[:fk].invert[attribute.name].camelcase}" -%>
-      <%% if defined?(<%=fk_class_name%>) %>
-          <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-          <%%= f.select :<%= attribute.name %>, options_for_select(@select_<%=attribute.name%>.map { |s| ["override this <%=attribute.name%> #{s.id}", s.id] }, f.object.<%=attribute.name%>), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
+  <div  class="row">
+    <div class="col-md-6">
+      <%%= f.field_container :<%= attribute.name %>, class: ['form-group'] do %>
+  <% if options[:fk].values.include?(attribute.name) -%>
+      <% fk_class_name = "Spree::#{options[:fk].invert[attribute.name].camelcase}" -%>
+        <%% if defined?(<%=fk_class_name%>) %>
+            <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+            <%%= f.select :<%= attribute.name %>, options_for_select(@select_<%=attribute.name%>.map { |s| [s.email, s.id] }, f.object.<%=attribute.name%>), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
+        <%% end %>
+  <% elsif options[:enum].keys.include?(attribute.name) -%>
+      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+      <%%= f.select :<%= attribute.name %>, options_for_select(Spree::<%=class_name%>.<%=attribute.name.pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name.pluralize%>.#{k}"), k]}, f.object.<%=attribute.name%>), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
+  <% elsif attribute.type == :image || attribute.type == :file -%>
+        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+        <%- if attribute.type == :image -%>
+            <%% if f.object.<%= attribute.name %>_file_name %>
+            <div><%%= image_tag f.object.<%= attribute.name %>.url(:small) -%></div>
+            <%% end %>
+        <%- elsif attribute.type == :file -%>
+            <%% if f.object.<%= attribute.name %>_file_name %>
+            <div><%%= link_to Spree.t(:download_file), f.object.<%= attribute.name %>.url, target: '_blank' %></div>
+            `<%% end %>
+        <%- end -%>
+        <%%= f.file_field :<%= attribute.name %>, class: 'form-control' %>
+  <% elsif attribute.type == :boolean -%>
+        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+        <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%=attribute.name%>, 1, :checked => f.object.<%= attribute.name %> == true %>&nbsp;&nbsp;
+        <%%=Spree.t("scaffold.say_no")%>: <%%= f.radio_button :<%=attribute.name%>, 0, :checked => f.object.<%= attribute.name %> == false %>&nbsp;&nbsp;
+  <% elsif attribute.type == :datetime -%>
+        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+        <%%= f.text_field :<%= attribute.name %>, value: datepicker_field_value(f.object.<%= attribute.name %>), class: 'datepicker form-control' %>
+  <% elsif attribute.type == :integer  -%>
+        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+        <%%= f.number_field :<%= attribute.name %>,  class: 'form-control', step: 1 %>
+  <% elsif attribute.type == :text  -%>
+      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+      <%%= f.text_area :<%= attribute.name %>,  class: 'form-control' %>
+  <% elsif attribute.type == :float  -%>
+      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+      <%%= f.number_field :<%= attribute.name %>,  class: 'form-control' %>
+  <% else -%>
+        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+        <%%= f.text_field :<%= attribute.name %>,  class: 'form-control' %>
+  <% end -%>
+        <%%= error_message_on :<%= singular_name %>, :<%= attribute.name %> %>
       <%% end %>
-<% elsif options[:enum].keys.include?(attribute.name) -%>
-    <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-    <%%= f.select :<%= attribute.name %>, options_for_select(Spree::<%=class_name%>.<%=attribute.name.pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name.pluralize%>.#{k}"), k]}, f.object.<%=attribute.name%>), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
-<% elsif attribute.type == :image || attribute.type == :file -%>
-      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%%= f.file_field :<%= attribute.name %>, class: 'form-control' %>
-<% elsif attribute.type == :boolean -%>
-      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%=attribute.name%>, 1, :checked => f.object.<%= attribute.name %> == true %>&nbsp;&nbsp;
-      <%%=Spree.t("scaffold.say_no")%>: <%%= f.radio_button :<%=attribute.name%>, 0, :checked => f.object.<%= attribute.name %> == false %>&nbsp;&nbsp;
-<% elsif attribute.type == :datetime -%>
-      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%%= f.text_field :<%= attribute.name %>, value: datepicker_field_value(f.object.<%= attribute.name %>), class: 'datepicker form-control' %>
-<% else -%>
-      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%%= f.text_field :<%= attribute.name %>,  class: 'form-control' %>
-<% end -%>
-      <%%= error_message_on :<%= singular_name %>, :<%= attribute.name %> %>
-<% if attribute.type == :image -%>
-      <%% if f.object.<%= attribute.name %>_file_name %>
-        <br><br>
-        <%%= image_tag f.object.<%= attribute.name %>.url(:large) -%>
-      <%% end %>
-<% elsif attribute.type == :file -%>
-      <%% if f.object.<%= attribute.name %>_file_name %>
-        <%%= link_to Spree.t(:download_file), f.object.<%= attribute.name %>.url,
-                              target: '_blank' %>
-      <%% end %>
-<% end -%>
-    <%% end %>
+    </div>
   </div>
 <% end -%>
 </div>
+
+
+<% options[:nested].each do |nested| -%>
+    <% if @nested_hash[nested].present? -%>
+        <div data-hook="admin_<%= singular_name %>_<%=nested%>_form_fields">
+          <%%= f.label :<%= nested %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=nested%>") %>
+        <span id="new_add_<%=nested.singularize%>">
+            <%%= link_to_with_icon('plus', Spree.t("scaffold.add_sub_item"), 'javascript:', :data => {:target => "tbody#<%=nested%>"}, :class => 'spree_add_sub_fields button fa fa-plus') %>
+        </span>
+          <table class="index sortable-only table" data-sortable-link="<%%= <%= "update_positions_admin_#{nested}_url" %> %>">
+            <thead data-hook="<%=nested.singularize%>_header">
+            <tr>
+              <%- @nested_hash[nested].map{|h| h[:name]}.each do |name| -%>
+                  <%- if name != 'position' && name != "#{singular_name}_id" -%>
+                      <th><%%= label_tag I18n.t(:<%=name%>, :scope => 'activerecord.attributes.spree/<%=nested.singularize%>') %></th>
+                  <%- end -%>
+              <%- end -%>
+              <th class="actions"></th>
+            </tr>
+            </thead>
+            <tbody id="<%=nested%>">
+            <%%= f.fields_for :<%=nested%> do |<%=nested%>_form| %>
+            <tr class="fields" class="<%%= cycle('odd', 'even') %>">
+              <%- @nested_hash[nested].each do |hash| -%>
+                  <%- if hash[:name] == 'position' || hash[:name] == "#{singular_name}_id" -%>
+                  <% elsif options[:enum].keys.include?(hash[:name]) -%>
+                      <td><%%= <%=nested%>_form.select :<%= hash[:name] %>, options_for_select(Spree::<%=nested.singularize.camelcase%>.<%=hash[:name].pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=nested.singularize%>.<%=hash[:name].pluralize%>.#{k}"), k]}, f.object.<%=hash[:name]%>), {<%=options[:presence].include?(hash[:name]) ? "" : "include_blank: true"%>}, {class: 'form-control'} %></td>
+                  <% elsif hash[:type] == :image || hash[:type] == :file -%>
+                      <td>
+                        <%- if hash[:type] == :image -%>
+                            <%% if <%=nested%>_form.object.<%= hash[:name] %>_file_name %>
+                            <div><%%= image_tag <%=nested%>_form.object.<%= hash[:name] %>.url(:mini) -%></div>
+                            <%% end %>
+                        <%- elsif hash[:type] == :file -%>
+                            <%% if <%=nested%>_form.object.<%= hash[:name] %>_file_name %>
+                            <div><%%= link_to Spree.t(:download_file), <%=nested%>_form.object.<%= hash[:name] %>.url, target: '_blank' %></div>
+                            `<%% end %>
+                        <%- end -%>
+                        <%%= <%=nested%>_form.file_field :<%= hash[:name] %>, class: 'form-control' %>
+                      </td>
+                  <%- elsif hash[:type] == :boolean -%>
+                      <td>
+                        <%%=Spree.t("scaffold.say_yes")%>: <%%= <%=nested%>_form.radio_button :<%=hash[:name]%>, 1, :checked => <%=nested%>_form.object.<%= hash[:name] %> == true %>&nbsp;&nbsp;
+                        <%%=Spree.t("scaffold.say_no")%>: <%%= <%=nested%>_form.radio_button :<%=hash[:name]%>, 0, :checked => <%=nested%>_form.object.<%= hash[:name] %> == false %>&nbsp;&nbsp;
+                      </td>
+                  <%- elsif hash[:type] == :datetime -%>
+                      <td><%%= <%=nested%>_form.text_field :<%= hash[:name] %>, value: datepicker_field_value(<%=nested%>_form.object.<%= hash[:name] %>), class: 'datepicker form-control' %></td>
+                  <%- elsif hash[:type] == :integer -%>
+                      <td><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control', step: 1 %></td>
+                  <%- elsif hash[:type] == :float -%>
+                      <td><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control' %></td>
+                  <%- else -%>
+                      <td><%%= <%=nested%>_form.text_field :<%= hash[:name] %>,  class: 'form-control' %></td>
+                  <%- end -%>
+              <%- end -%>
+              <td class="actions">
+                <%%= <%=nested%>_form.hidden_field :id %>
+                <%%= link_to_with_icon('delete', '', '#', :class => "spree_remove_sub_fields btn btn-sm btn-default", :title => Spree.t(:remove)) %>
+              </td>
+            </tr>
+            <%% end %>
+            </tbody>
+          </table>
+        </div>
+    <% end -%>
+<% end -%>
+
+<%- if options[:nested].any? -%>
+<script>
+  var subFieldId = 0;
+  $('.spree_add_sub_fields').click(function () {
+    var target = $(this).data("target");
+    var new_table_row = $(target + ' tr:visible:last').clone();
+    var new_id = new Date().getTime() + (subFieldId++);
+    new_table_row.find("input, select").each(function () {
+      var el = $(this);
+      el.prop("id", el.prop("id").replace(/\d+/, new_id))
+      el.prop("name", el.prop("name").replace(/\d+/, new_id))
+    })
+    // When cloning a new row, set the href of all icons to be an empty "#"
+    // This is so that clicking on them does not perform the actions for the
+    // duplicated row
+    new_table_row.find("a").each(function () {
+      var el = $(this);
+      el.prop('href', '#');
+    })
+    $(target).append(new_table_row);
+  });
+
+  $('body').on('click', 'a.spree_remove_sub_fields', function() {
+    el = $(this);
+
+    if ( el.parents("table").find('a.spree_remove_sub_fields').length == 1) {
+      el.parents("tr").find("input").val("");
+    } else {
+      el.prev("input[type=hidden]").val("1");
+      el.closest(".fields").hide();
+      if (el.prop("href").substr(-1) == '#') {
+        el.parents("tr").fadeOut('hide', function () {
+          var name = $(this).find("[name$='[id]']").attr("name").replace("[id]", "") + "[_destroy]"
+          $(this).append($("<input type='hidden' name='" + name + "' value='1'/>"));
+        });
+      } else if (el.prop("href")) {
+        $.ajax({
+          type: 'POST',
+          url: el.prop("href"),
+          data: {
+            _method: 'delete',
+            authenticity_token: AUTH_TOKEN
+          },
+          success: function (response) {
+            el.parents("tr").fadeOut('hide');
+          },
+          error: function (response, textStatus, errorThrown) {
+            show_flash('error', response.responseText);
+          }
+
+        })
+      }
+    }
+    return false;
+  });
+</script>
+<%- end -%>

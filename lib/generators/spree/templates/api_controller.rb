@@ -35,8 +35,8 @@ module Spree
         end
 
         def update
-          authorize! :update, <%=singular_name%>
-          if <%=singular_name%>.update_attributes(map_nested_attributes_keys(Spree::<%=class_name%>, <%=singular_name%>_params))
+          authorize! :update, @<%=singular_name%>
+          if @<%=singular_name%>.update_attributes(map_nested_attributes_keys(Spree::<%=class_name%>, <%=singular_name%>_params))
             respond_with(@<%=singular_name%>, :status => 200, :default_template => :show)
           else
             invalid_resource!(@<%=singular_name%>)

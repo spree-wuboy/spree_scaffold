@@ -59,6 +59,13 @@ module Spree
 <% if options[:presence].any? || options[:unique].any? -%>
     # read http://apidock.com/rails/ActiveRecord/Validations/ClassMethods for more validations
 <% end -%>
+<% options[:nested].each do |nested| -%>
+    has_many :<%=nested%>, dependent: :destroy
+<% end -%>
+
+<% options[:nested].each do |nested| -%>
+    accepts_nested_attributes_for :<%=nested%>
+<% end -%>
 
 <% if slugged? -%>
     def slug_candidates

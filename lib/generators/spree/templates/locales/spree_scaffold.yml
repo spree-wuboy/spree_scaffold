@@ -11,3 +11,5 @@
       batch: batch
       search_checked: "checked only:"
       menu: "new functions"
+      add_sub_item: "add sub item"
+      back_to_resources_list: "back to list"

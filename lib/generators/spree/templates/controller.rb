@@ -9,6 +9,18 @@ module Spree
       before_action :add_edit_fk, only: [:edit, :new, :update, :create]
       before_action :add_search_fk, only: :index
 
+      def new
+      <%- options[:nested].each do |nested| -%>
+          @object.<%=nested%>.build
+      <%- end -%>
+      end
+
+      def edit
+      <%- options[:nested].each do |nested| -%>
+        @object.<%=nested%>.build unless @object.<%=nested%>.any?
+      <%- end -%>
+      end
+
       def index
         respond_with(@collection) do |format|
           format.html
