@@ -2,7 +2,7 @@
 <% attributes.each do |attribute| -%>
 <% next if (attribute.name == 'position' && attribute.type == :integer) || attribute.name == 'slug' || attribute.name == 'deleted_at' -%>
   <div  class="row">
-    <div class="col-md-6">
+    <div class="col-md-6" data-hook="col-<%= attribute.name %>">
       <%%= f.field_container :<%= attribute.name %>, class: ['form-group'] do %>
   <% if options[:fk].values.include?(attribute.name) -%>
       <% fk_class_name = "Spree::#{options[:fk].invert[attribute.name].camelcase}" -%>
@@ -27,8 +27,10 @@
         <%%= f.file_field :<%= attribute.name %>, class: 'form-control' %>
   <% elsif attribute.type == :boolean -%>
         <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-        <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%=attribute.name%>, 1, :checked => f.object.<%= attribute.name %> == true %>&nbsp;&nbsp;
-        <%%=Spree.t("scaffold.say_no")%>: <%%= f.radio_button :<%=attribute.name%>, 0, :checked => f.object.<%= attribute.name %> == false %>&nbsp;&nbsp;
+        <div>
+          <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%=attribute.name%>, 1, :checked => f.object.<%= attribute.name %> == true %>&nbsp;&nbsp;
+          <%%=Spree.t("scaffold.say_no")%>: <%%= f.radio_button :<%=attribute.name%>, 0, :checked => f.object.<%= attribute.name %> == false %>&nbsp;&nbsp;
+        </div>
   <% elsif attribute.type == :datetime -%>
         <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
         <%%= f.text_field :<%= attribute.name %>, value: datepicker_field_value(f.object.<%= attribute.name %>), class: 'datepicker form-control' %>
@@ -77,9 +79,9 @@
               <%- @nested_hash[nested].each do |hash| -%>
                   <%- if hash[:name] == 'position' || hash[:name] == "#{singular_name}_id" -%>
                   <% elsif options[:enum].keys.include?(hash[:name]) -%>
-                      <td><%%= <%=nested%>_form.select :<%= hash[:name] %>, options_for_select(Spree::<%=nested.singularize.camelcase%>.<%=hash[:name].pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=nested.singularize%>.<%=hash[:name].pluralize%>.#{k}"), k]}, f.object.<%=hash[:name]%>), {<%=options[:presence].include?(hash[:name]) ? "" : "include_blank: true"%>}, {class: 'form-control'} %></td>
+                      <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.select :<%= hash[:name] %>, options_for_select(Spree::<%=nested.singularize.camelcase%>.<%=hash[:name].pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=nested.singularize%>.<%=hash[:name].pluralize%>.#{k}"), k]}, f.object.<%=hash[:name]%>), {<%=options[:presence].include?(hash[:name]) ? "" : "include_blank: true"%>}, {class: 'form-control'} %></td>
                   <% elsif hash[:type] == :image || hash[:type] == :file -%>
-                      <td>
+                      <td data-hook="col-<%= hash[:name] %>">
                         <%- if hash[:type] == :image -%>
                             <%% if <%=nested%>_form.object.<%= hash[:name] %>_file_name %>
                             <div><%%= image_tag <%=nested%>_form.object.<%= hash[:name] %>.url(:mini) -%></div>
@@ -92,18 +94,18 @@
                         <%%= <%=nested%>_form.file_field :<%= hash[:name] %>, class: 'form-control' %>
                       </td>
                   <%- elsif hash[:type] == :boolean -%>
-                      <td>
+                      <td data-hook="col-<%= hash[:name] %>">
                         <%%=Spree.t("scaffold.say_yes")%>: <%%= <%=nested%>_form.radio_button :<%=hash[:name]%>, 1, :checked => <%=nested%>_form.object.<%= hash[:name] %> == true %>&nbsp;&nbsp;
                         <%%=Spree.t("scaffold.say_no")%>: <%%= <%=nested%>_form.radio_button :<%=hash[:name]%>, 0, :checked => <%=nested%>_form.object.<%= hash[:name] %> == false %>&nbsp;&nbsp;
                       </td>
                   <%- elsif hash[:type] == :datetime -%>
-                      <td><%%= <%=nested%>_form.text_field :<%= hash[:name] %>, value: datepicker_field_value(<%=nested%>_form.object.<%= hash[:name] %>), class: 'datepicker form-control' %></td>
+                      <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.text_field :<%= hash[:name] %>, value: datepicker_field_value(<%=nested%>_form.object.<%= hash[:name] %>), class: 'datepicker form-control' %></td>
                   <%- elsif hash[:type] == :integer -%>
-                      <td><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control', step: 1 %></td>
+                      <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control', step: 1 %></td>
                   <%- elsif hash[:type] == :float -%>
-                      <td><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control' %></td>
+                      <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control' %></td>
                   <%- else -%>
-                      <td><%%= <%=nested%>_form.text_field :<%= hash[:name] %>,  class: 'form-control' %></td>
+                      <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.text_field :<%= hash[:name] %>,  class: 'form-control' %></td>
                   <%- end -%>
               <%- end -%>
               <td class="actions">

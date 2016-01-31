@@ -45,6 +45,7 @@ module Spree
 
         def <%=singular_name%>_attributes
             [
+              :id,
             <%- attributes.each do |attribute| -%>
             <%- next unless attribute.name != "slug" -%>
               :<%=attribute.name%>,

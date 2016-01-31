@@ -55,9 +55,11 @@
   <% elsif options[:enum].keys.include?(column) -%>
                   <%%= f.select :<%= column %>_eq, options_for_select(Spree::<%=class_name%>.<%=column.pluralize%>.map{|k,v| [I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=column.pluralize%>.#{k}"), v]}), {include_blank: true}, {class: 'form-control'} %>
   <% elsif attribute.type == :boolean -%>
-                  <%%=Spree.t("scaffold.none")%>: <%%= f.radio_button :<%=column%>_eq, -1, :checked => (params[:q][:<%=column%>_eq]=='-1') %>&nbsp;&nbsp;
-                  <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%=column%>_eq, 1, :checked => params[:q][:<%=column%>_eq] == '1' %>&nbsp;&nbsp;
-                  <%%=Spree.t("scaffold.say_no")%>: <%%= f.radio_button :<%=column%>_eq, 0, :checked => params[:q][:<%=column%>_eq] == '0' %>&nbsp;&nbsp;
+                  <div>
+                    <%%=Spree.t("scaffold.none")%>: <%%= f.radio_button :<%=column%>_eq, -1, :checked => (params[:q][:<%=column%>_eq]=='-1') %>&nbsp;&nbsp;
+                    <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%=column%>_eq, 1, :checked => params[:q][:<%=column%>_eq] == '1' %>&nbsp;&nbsp;
+                    <%%=Spree.t("scaffold.say_no")%>: <%%= f.radio_button :<%=column%>_eq, 0, :checked => params[:q][:<%=column%>_eq] == '0' %>&nbsp;&nbsp;
+                  </div>
   <% else -%>
                   <%%= f.<%= attribute.field_type %> :<%=column%>_cont, class: "form-control <%=search_first ? 'js-quick-search-target' : ''%>" %>
                   <% search_first = false -%>

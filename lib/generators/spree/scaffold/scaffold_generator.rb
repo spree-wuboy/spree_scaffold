@@ -136,6 +136,7 @@ module Spree
 
       def create_nested
         log_path = "log/scaffold.log"
+        create_file log_path unless File.exist?(File.join(destination_root, log_path))
         @nested_hash = {}
         File.readlines(log_path).each do |line|
           options[:nested].each do |nested|

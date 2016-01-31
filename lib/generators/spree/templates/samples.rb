@@ -1,4 +1,6 @@
 require 'faker'
+I18n.enforce_available_locales = false
+Faker::Config.locale = <%=options[:locale].keys%>.sample.to_sym if <%=options[:locale].keys%>.any?
 
 <% attributes.each do |attribute| -%>
 <% if options[:fk].values.include?(attribute.name) -%>
@@ -11,7 +13,6 @@ require 'faker'
 <% end -%>
 
 100.times.each do
-  Faker::Config.locale = <%=options[:locale].keys%>.sample.to_sym if <%=options[:locale].keys%>.any?
   Spree::<%=class_name%>.create({
 <% attributes.each do |attribute| -%>
 <% if options[:fk].values.include?(attribute.name) -%>
