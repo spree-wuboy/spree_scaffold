@@ -8,7 +8,7 @@
 <%% end %>
 
 <%% content_for :page_actions do %>
-  <%%= button_link_to Spree.t(:back_to_resources_list), collection_url, :icon => 'arrow-left' %>
+  <%%= button_link_to Spree.t("scaffold.back_to_resources_list"), collection_url, :icon => 'arrow-left' %>
 <%% end %>
 
 <div data-hook="admin_<%= singular_name %>_new_form_header">

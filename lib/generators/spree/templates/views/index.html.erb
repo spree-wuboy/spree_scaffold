@@ -119,7 +119,7 @@
 <% end -%>
 <% attributes.each do |attribute| -%>
 <% if (attribute.type == :string && attribute.name != "slug") || attribute.type == :boolean || (attribute.type == :integer && !(options[:fk].values.include?(attribute.name))) || attribute.type == :datetime  -%>
-        <th><%%= t(:<%= attribute.name %>, scope: 'activerecord.attributes.spree/<%= singular_name %>') %></th>
+        <th><%%=sort_link(@search, :<%= attribute.name %>, t(:<%= attribute.name %>, scope: 'activerecord.attributes.spree/<%= singular_name %>') , default_order: :desc)%></th>
 <% end -%>
 <% end -%>
       <th data-hook="admin_<%= plural_name %>_index_header_actions" class="actions"></th>
@@ -146,6 +146,8 @@
         <td><%%= Spree.t("scaffold.say_#{<%= singular_name %>.<%= attribute.name %>}") %></td>
 <% elsif attribute.type == :datetime -%>
         <td><%%= l(<%= singular_name %>.<%= attribute.name %>) if <%= singular_name %>.<%= attribute.name %>.present? %></td>
+<% elsif attribute.type == :image -%>
+        <td><%%= link_to image_tag(<%= singular_name %>.<%= attribute.name %>.url(:mini)), edit_object_url(<%= singular_name %>) if <%= singular_name %>.<%= attribute.name %>_file_name.present? %></td>
 <% end -%>
 <% end -%>
         <td data-hook="admin_<%= plural_name %>_index_row_actions" class="actions text-right">

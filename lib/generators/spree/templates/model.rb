@@ -64,7 +64,7 @@ module Spree
 <% end -%>
 
 <% options[:nested].each do |nested| -%>
-    accepts_nested_attributes_for :<%=nested%>
+    accepts_nested_attributes_for :<%=nested%>, allow_destroy: true
 <% end -%>
 
 <% if slugged? -%>

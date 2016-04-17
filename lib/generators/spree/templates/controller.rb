@@ -17,7 +17,7 @@ module Spree
 
       def edit
       <%- options[:nested].each do |nested| -%>
-        @object.<%=nested%>.build unless @object.<%=nested%>.any?
+        @object.<%=nested%>.build
       <%- end -%>
       end
 

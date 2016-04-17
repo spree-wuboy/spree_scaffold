@@ -13,12 +13,12 @@ zh-TW:
       models:
         spree/<%= singular_name %>:
 <% unless options[:presence].any? -%>
-          blank: "不可為空"
+          blank: "必填"
 <% else -%>
           attributes:
 <% options[:presence].each do |p| -%>
             <%=p%>:
-              blank: "不可為空"
+              blank: "必填"
 <% end -%>
 <% end -%>
 <% unless options[:unique].any? -%>
