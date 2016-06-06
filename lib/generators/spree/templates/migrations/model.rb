@@ -3,7 +3,12 @@ class CreateSpree<%= class_name.pluralize %> < ActiveRecord::Migration
     create_table :spree_<%= table_name %> do |t|
 <% attributes.each do |attribute| -%>
 <% next if attribute.type == :image || attribute.type == :file -%>
+   <%- if attribute.type == :polymorphic -%>
+      t.string :<%= attribute.name -%>_type
+      t.integer :<%= attribute.name -%>_id
+   <%- else -%>
       t.<%= attribute.type %> :<%= attribute.name %> <%= options[:default].keys.include?(attribute.name) ? ", default: #{(attribute.type == :boolean || attribute.type == :integer) ? options[:default][attribute.name] : "'#{options[:default][attribute.name]}'"}" : ""%>
+   <%- end -%>
 <% end -%>
 <% unless options[:skip_timestamps] -%>
       t.timestamps
@@ -12,7 +17,11 @@ class CreateSpree<%= class_name.pluralize %> < ActiveRecord::Migration
 
 <% attributes.each do |attribute| -%>
   <%- if attribute.name == "deleted_at" || options[:fk].values.include?(attribute.name) || options[:search].include?(attribute.name) -%>
+    <%- if attribute.type == "polymorphic" -%>
+    add_index :spree_<%= table_name %>, [:<%=attribute.name%>_type, :<%=attribute.name%>_id] <%=options[:unique].include?(attribute.name) ? ", unique: true" : ""%>
+    <%- else -%>
     add_index :spree_<%= table_name %>, :<%=attribute.name%> <%=options[:unique].include?(attribute.name) ? ", unique: true" : ""%>
+    <%- end -%>
   <%- end -%>
 <% end -%>
 

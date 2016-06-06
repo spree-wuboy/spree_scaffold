@@ -35,7 +35,10 @@ module Spree
     has_attached_file :<%= attribute.name %>,
                       url: '/spree/<%= plural_name %>/:id/:basename.:extension',
                       path: ':rails_root/public/spree/<%= plural_name %>/:id/:basename.:extension'
-
+<% elsif attribute.type == :polymorphic -%>
+    # please add has_many or has_one relationship to parent model by yourselfs
+    # has_many :images, -> { order(:position) }, as: :viewable, dependent: :destroy, class_name: "Spree::Image"
+    belongs_to :<%=attribute.name%>, polymorphic: true, touch: true
 <% elsif options[:enum].keys.include?(attribute.name) -%>
     enum <%=attribute.name%>: [<%=options[:enum][attribute.name].split(",").map{|v| ":#{v}"}.join(", ")%>]
 <% end -%>

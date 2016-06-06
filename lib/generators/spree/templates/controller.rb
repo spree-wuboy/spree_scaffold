@@ -114,6 +114,8 @@ module Spree
         if defined?(<%=fk_class_name%>)
           @select_<%=attribute.name%> = <%=fk_class_name%>.all
         end
+<% elsif attribute.type == :polymorphic -%>
+          @select_<%=attribute.name%>_id = @object.present? && @object.<%=attribute.name%>_type.present? ? @object.<%=attribute.name%>_type.constantize.all : []
 <% end -%>
 <% end -%>
       end
