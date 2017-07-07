@@ -1,0 +1,17 @@
+@import "bootstrap-sprockets";
+@import "spree/frontend/variables";
+@import "bootstrap";
+
+@include make-grid(sm);
+@include make-grid(md);
+@include make-grid(lg);
+
+header {
+  padding: 10px 5px;
+}
+
+.page-break {
+  display: block;
+  clear: both;
+  page-break-after: always;
+}
