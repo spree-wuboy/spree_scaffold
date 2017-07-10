@@ -13,3 +13,5 @@ zh-TW:
       menu: "新增功能"
       add_sub_item: "新增子項目"
       back_to_resources_list: "回列表"
+      filter_results: "搜尋"
+      reset: "重設"

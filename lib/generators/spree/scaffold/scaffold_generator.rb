@@ -18,6 +18,7 @@ module Spree
       class_option :presence, type: :array, default: [], required: false, desc: 'validate presence'
       class_option :unique, type: :array, default: [], required: false, desc: 'validate uniqueness'
       class_option :nested, type: :array, default: [], required: false, desc: 'nested attributes(comments, ingredients), you must make sure log/scaffold.log already have the class'
+      class_option :cache, type: :boolean, default: false, required: false, desc: 'make an simple cache mechanism'
 
       def self.next_migration_number(path)
         if @prev_migration_nr
@@ -87,11 +88,9 @@ module Spree
           @name = options[:locale][locale] ? options[:locale][locale].force_encoding("ASCII-8BIT") : singular_name
           if current_locales.include?(locale) && locale != "en"
             template "locales/#{locale}.yml", "config/locales/#{plural_name}.#{locale}.yml"
-            template "locales/spree_scaffold.#{locale}.yml", "config/locales/spree_scaffold.#{locale}.yml"
           else
             @locale = locale
             template "locales/locale.yml", "config/locales/#{plural_name}.#{locale}.yml"
-            template "locales/spree_scaffold.yml", "config/locales/spree_scaffold.#{locale}.yml"
           end
         end
       end

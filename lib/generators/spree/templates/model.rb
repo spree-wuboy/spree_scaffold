@@ -13,10 +13,10 @@ module Spree
     friendly_id :slug_candidates, use: [:slugged, :finders]
 <% end -%>
 <% if i18n? -%>
-    <%% if defined?(SpreeGlobalize) %>
+    if defined?(SpreeGlobalize)
         translates <%= options[:i18n].map { |f| ":#{f}" }.join(', ') %>
         include SpreeGlobalize::Translatable
-    <%% end %>
+    end
 <% end -%>
 <% if attributes.map(&:name).include?("deleted_at") -%>
     acts_as_paranoid
@@ -73,6 +73,26 @@ module Spree
 <% if slugged? -%>
     def slug_candidates
       [:<%= attributes.find { |a| a.type == :string }.name %>]
+    end
+<% end -%>
+<% if options[:cache] -%>
+    after_save :reload_cache
+
+    def self.cached
+      Rails.cache.fetch("<%= class_name.underscore %>") do
+        all
+      end
+    end
+
+    def cached
+      self.class.cached
+    end
+
+    private
+
+    def reload_cache
+      Rails.cache.delete("<%= class_name.underscore %>")
+      cached
     end
 <% end -%>
   end
