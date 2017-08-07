@@ -1,13 +1,14 @@
 module Spree
   module Admin
     class <%= class_name.pluralize %>Controller < ResourceController
-      helper_method :batch_url, :check_all_url
+      helper_method :batch_url, :batch_check_url
       respond_to :html, :json, :pdf
       include ::PdfHelper
       helper ::WickedPdfHelper::Assets
 
       before_action :add_edit_fk, only: [:edit, :new, :update, :create]
       before_action :add_search_fk, only: :index
+      before_action :init_checked
 
       def new
       <%- options[:nested].each do |nested| -%>
@@ -25,8 +26,17 @@ module Spree
         respond_with(@collection) do |format|
           format.html
           format.pdf do
-            render_with_wicked_pdf :pdf => Time.now.to_i.to_s, :show_as_html => params[:debug]
+            render_with_wicked_pdf :pdf => "<%=plural_name%>_#{Time.now.to_i.to_s}",
+                                   :show_as_html => params[:debug],
+                                   :layout => "layouts/pdf.pdf"
           end
+          format.csv {
+            data = @collection.to_csv({}, params.to_unsafe_h)
+            require 'iconv'
+            big5_data = Iconv.new("big5//IGNORE", "utf-8").iconv(data)
+            send_data big5_data, :filename => "<%=plural_name%>_#{Time.now.to_i.to_s}.csv",
+                      :disposition => 'inline', :type => "text/csv"
+          }
         end
       end
 
@@ -35,23 +45,36 @@ module Spree
         respond_with(@collection) do |format|
           format.html
           format.pdf do
-            render_with_wicked_pdf :pdf => Time.now.to_i.to_s, :show_as_html => params[:debug]
+            render_with_wicked_pdf :pdf => "<%=plural_name%>_#{@collection.size}_#{Time.now.to_i.to_s}",
+                                   :show_as_html => params[:debug],
+                                   :layout => "layouts/pdf.pdf"
           end
         end
       end
 
-      def check_all
-        session[:ids] ||= []
-        @collection = collection
-        ids = @collection.pluck(:id)
-        if params[:checked] == "all"
-          session[:ids] = []
-        elsif params[:checked] == "true"
-          session[:ids] = (session[:ids] + ids).uniq
-        else
-          session[:ids] = (session[:ids] - ids).uniq
+      def batch_checked
+        if params[:all].present?
+          if params[:all] == "true"
+            session[:<%=plural_name%>_checked] = collection.pluck(:id)
+          elsif params[:all] == "reverse"
+            collection.pluck(:id).each do |id|
+              session[:<%=plural_name%>_checked].include?(id) ? session[:<%=plural_name%>_checked].delete(id) : session[:<%=plural_name%>_checked].push(id)
+            end
+          elsif params[:all] == "false"
+            session[:<%=plural_name%>_checked] = []
+          end
         end
-        render :js => "window.location = '#{collection_url(:q => params[:q], :page => params[:page], :per_page => params[:per_page])}'"
+        params.delete(:all)
+        redirect_to collection_url(:params => params.to_unsafe_h)
+      end
+
+      def add_checked
+        if params[:checked] && params[:checked] == "true"
+          session[:<%=plural_name%>_checked].push(@object.id) unless session[:<%=plural_name%>_checked].include?(@object.id)
+        else
+          session[:<%=plural_name%>_checked].delete(@object.id) if session[:<%=plural_name%>_checked].include?(@object.id)
+        end
+        render :nothing => true
       end
 
       def show
@@ -63,31 +86,29 @@ module Spree
         end
       end
 
-      def check
-        session[:ids] ||= []
-        if params[:checked] == "true"
-          session[:ids].push(params[:id].to_i)
-          render :nothing => true
-        else
-          session[:ids].delete(params[:id].to_i)
-          render :js => "document.getElementById('check_all').checked = false"
-        end
+      def seacher
+          params[:q] ||= {}
+          params[:q][:s] ||= 'created_at desc'
+          if !params[:q][:created_at_gt].blank?
+            params[:q][:created_at_gt] = Time.zone.parse(params[:q][:created_at_gt]).beginning_of_day rescue ""
+          end
+
+          if !params[:q][:created_at_lt].blank?
+            params[:q][:created_at_lt] = Time.zone.parse(params[:q][:created_at_lt]).end_of_day rescue ""
+          end
+          base_search = method(:collection).super_method.call
+          base_search.includes(<%=options[:fk].keys.map{|fk| fk.to_sym}%>)
+          if params[:q][:checked] == "true"
+            base_search.ransack(params[:q].merge(:id_in => session[:<%=plural_name%>_checked]))
+          else
+            base_search.ransack(params[:q])
+          end
       end
 
       def collection
         return @collection if @collection.present?
-        params[:q] ||= {}
-        search_checked = params[:q].delete(:search_checked)
-        @collection = super
-        @collection.includes(<%=options[:fk].keys.map{|fk| fk.to_sym}%>)
-        if search_checked == "true"
-          @search = @collection.ransack(params[:q].merge(:id_in => session[:ids]))
-          params[:q][:search_checked] = true
-        else
-          @search = @collection.ransack(params[:q])
-          params[:q][:search_checked] = false
-        end
-        if params[:format] == :pdf
+        @search = seacher
+        if (params[:format] == "pdf" || params[:format] == "csv")
           @collection = @search.result(distinct: true)
         else
           @collection = @search.result(distinct: true).
@@ -101,11 +122,15 @@ module Spree
         batch_admin_<%=plural_name%>_url(options)
       end
 
-      def check_all_url(options = {})
-        check_all_admin_<%=plural_name%>_url(options)
+      def batch_check_url(options = {})
+        batch_checked_admin_<%=plural_name%>_url(options)
       end
 
       private
+
+      def init_checked
+        session[:<%=plural_name%>_checked] ||= []
+      end
 
       def add_edit_fk
 <% attributes.each do |attribute| -%>

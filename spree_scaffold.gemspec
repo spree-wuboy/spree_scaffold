@@ -18,7 +18,8 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'spree_core'
   s.add_dependency 'wkhtmltopdf-binary'
-  s.add_dependency 'wicked_pdf'
+  s.add_dependency 'wicked_pdf', '1.0.6'
+  s.add_dependency 'iconv'
   s.add_dependency 'faker'
 
   s.add_development_dependency 'capybara', '~> 2.1'

@@ -10,6 +10,7 @@
 <%% content_for :page_actions do %>
   <%%= button_link_to Spree.t("scaffold.print"), collection_url(:format => "pdf", :params => params.to_unsafe_h), :icon => 'icon-plus', :id => 'admin_print_post', :target => "_blank" %>
   <%%= button_link_to Spree.t("scaffold.batch"), batch_url(:format => "pdf", :params => params.to_unsafe_h), :icon => 'icon-plus', :id => 'admin_print_post', :target => "_blank" %>
+  <%%= button_link_to Spree.t("scaffold.export"), collection_url(:format => "csv", :params => params.to_unsafe_h), :icon => 'icon-print', :id => 'admin_export_post', :target => "_blank" %>
   <%%= button_link_to Spree.t(:new_<%= singular_name %>), new_object_url, class: 'btn-success', icon: 'add', id: 'admin_new_<%= singular_name %>_link' if can?(:create, Spree::<%= class_name %>) %>
 <%% end %>
 
@@ -93,8 +94,10 @@
 <% end -%>
           <div class="col-md-6">
             <div class="form-group">
-              <%%= label_tag('search_checked', Spree.t("scaffold.search_checked"))   %>
-              <%%= f.check_box :search_checked, {:checked => (params[:q] ? params[:q][:search_checked] : nil)}, true, false %>
+              <%%= label_tag 'q_checked_eq' do %>
+                  <%%= f.check_box :checked, {:checked => (params[:q] && params[:q][:checked] == "true")}, 'true', '' %>
+                  <%%= Spree.t(:search_checked) %>
+              <%% end %>
             </div>
           </div>
         </div>
@@ -124,10 +127,9 @@
 <% end -%>
       <th data-hook="admin_<%= plural_name %>_index_header_actions" class="actions"></th>
       <th data-hook="admin_<%= plural_name %>_index_header_checks" class="checks text-center">
-        <%%= check_box_tag( "checked", true, (@<%= plural_name %>.map(&:id) & (session[:ids] ||= [])) == @<%= plural_name %>.map(&:id), :id => :check_all, data: {remote: true, url: check_all_url(:q => params[:q], :page => params[:page], :per_page => params[:per_page])}) %>
-        <%% if session[:ids].present? %>
-        <%%= link_to_with_icon('remove', '', check_all_url(:checked => 'all', :q => params[:q], :page => params[:page], :per_page => params[:per_page]), class: "btn btn-danger btn-xs", data: { action: 'remove', remote: true }) %>
-        <%% end %>
+        <%%= link_to Spree.t('scaffold.check_page'), batch_checked_admin_<%= plural_name %>_path(:params => params.to_unsafe_h.merge(:all => "true")) , :class => "btn btn-xs btn-primary batch-checked"%>
+        <%%= link_to Spree.t('scaffold.check_reverse'), batch_checked_admin_<%= plural_name %>_path(:params => params.to_unsafe_h.merge(:all => "reverse")), :class => "btn btn-xs btn-default batch-checked"%>
+        <%%= link_to Spree.t('scaffold.check_none'), batch_checked_admin_<%= plural_name %>_path(:params => params.to_unsafe_h.merge(:all => "false")), :class => "btn btn-xs btn-warning batch-checked"%>
       </th>
     </tr>
   </thead>
@@ -159,7 +161,7 @@
 <% end -%>
         </td>
         <td data-hook="admin_<%= plural_name %>_index_row_checks" class="checks text-center">
-          <%%= check_box_tag( "checked", true, (session[:ids] && session[:ids].include?(<%= singular_name %>.id)), data: {remote: true, url: check_admin_<%= singular_name %>_url(<%= singular_name %>.id)}) %>
+          <%%= check_box_tag( "checked", true, (session[:<%= plural_name %>_checked] && session[:<%= plural_name %>_checked].include?(<%= singular_name %>.id)), data: {remote: true, url: add_checked_admin_<%= singular_name %>_url(<%= singular_name %>.id)}) %>
         </td>
       </tr>
     <%% end %>

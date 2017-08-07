@@ -41,6 +41,7 @@ zh-TW:
 <% end -%>
 <%- end -%>
 <% end -%>
+        checked: "勾選"
 <% options[:nested].each do |nested| -%>
         <%=nested%>: '<%=nested%>'
 <% end -%>

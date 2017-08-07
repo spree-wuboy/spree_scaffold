@@ -1,0 +1,48 @@
+en:
+  spree:
+    updated_at: "updated at"
+    scaffold:
+      none: none
+      say_yes: yes
+      say_no: no
+      say_true: yes
+      say_false: no
+      print: print
+      batch: batch
+      search_checked: "checked only:"
+      menu: "new functions"
+      add_sub_item: "add sub item"
+      back_to_resources_list: "back to list"
+      filter_results: "filter results"
+      reset: "reset"
+      check_page: Page
+      check_reverse: Rev
+      check_none: None
+      report_search_criteria: "search criteria"
+      conditions:
+        eq: "equal to"
+        not_eq: "not equal to"
+        lt: "lower than"
+        gt: "greater than"
+        lteq: "lower than and equal to"
+        gteq: "greater than and equal to"
+        in: "in"
+        not_in: "not_in"
+        cont: "contain"
+        not_cont: "not contain"
+        cont_any: "contain any of"
+        not_cont_any: "not contain any of"
+        cont_all: "contain all of"
+        not_cont_all: "not contain all of"
+        start: "start with"
+        not_start: "not start with"
+        end: "end with"
+        not_end: "not end with"
+        true: "true"
+        not_true: "false or nil"
+        false: "false"
+        not_false: "true or nil"
+        present: "present"
+        blank: "blank"
+        null: "null"
+        not_null: "not null"

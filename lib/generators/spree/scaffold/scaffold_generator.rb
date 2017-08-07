@@ -155,11 +155,11 @@ Spree::Core::Engine.add_routes do
     resources :#{plural_name} do
       collection do
         get :batch
-        get :check_all
+        get :batch_checked
         post :update_positions
       end
       member do
-        get :check
+        get :add_checked
       end
     end
   end

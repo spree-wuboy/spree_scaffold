@@ -41,6 +41,7 @@
 <% end -%>
 <%- end -%>
 <% end -%>
+        checked: "checked"
 <% options[:nested].each do |nested| -%>
         <%=nested%>: '<%=nested%>'
 <% end -%>
