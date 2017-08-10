@@ -18,7 +18,7 @@ module Spree
       class_option :presence, type: :array, default: [], required: false, desc: 'validate presence'
       class_option :unique, type: :array, default: [], required: false, desc: 'validate uniqueness'
       class_option :nested, type: :array, default: [], required: false, desc: 'nested attributes(comments, ingredients), you must make sure log/scaffold.log already have the class'
-      class_option :cache, type: :boolean, default: false, required: false, desc: 'make an simple cache mechanism'
+      class_option :cache, type: :boolean, default: false, required: false, desc: 'make a simple cache mechanism'
 
       def self.next_migration_number(path)
         if @prev_migration_nr
@@ -66,19 +66,37 @@ module Spree
         migration_template 'migrations/model.rb', "db/migrate/create_spree_#{plural_name}.rb"
       end
 
+      def create_assets
+        %w{javascripts stylesheets}.each do |path|
+          empty_directory "app/assets/#{path}/spree/frontend"
+          empty_directory "app/assets/#{path}/spree/backend"
+        end
+        assets = ["assets/javascripts/spree/frontend/all.js",
+                  "assets/stylesheets/spree/frontend/all.css",
+                  "assets/javascripts/spree/backend/all.js",
+                  "assets/stylesheets/spree/backend/all.css"]
+        assets.each do |path|
+          template path, "app/#{path}" unless File.exist?("app/#{path}")
+        end
+        if i18n?
+          inject_into_file "app/assets/javascripts/spree/backend/all.js", "//= require spree/backend/spree_globalize\n", before: /\/\/= require_tree/
+          inject_into_file 'app/assets/stylesheets/spree/backend/all.css', " *= require spree/backend/spree_globalize\n", before: / \*= require_tree/
+        end
+      end
+
       def create_samples
-        template "samples.rb", "db/samples/#{plural_name}.rb"
+        template "samples.rb", "db/samples/spree/#{plural_name}.rb"
       end
 
       def create_task
-        template "task.rake", "lib/tasks/#{singular_name}.rake"
+        template "task.rake", "lib/tasks/spree/#{plural_name}.rake"
       end
 
       def create_logs
         log_path = "log/scaffold.log"
         create_file log_path unless File.exist?(File.join(destination_root, log_path))
         gsub_file log_path, /rails g spree:scaffold #{name}.*\n/, ""
-        append_file log_path, "rails g spree:scaffold #{name} #{attributes.map{|a| "#{a.name}:#{a.type}"}.join(" ")} #{options.map{|o,v| v.present? ? "--#{o}=#{v.is_a?(Array) ? v.join(" ") : v.is_a?(Hash) ? v.map{|k1,v1| "#{k1}:#{v1}"}.join(" ") : v}" : ''}.join(" ")}\n".force_encoding("ASCII-8BIT")
+        append_file log_path, "rails g spree:scaffold #{name} #{attributes.map {|a| "#{a.name}:#{a.type}"}.join(" ")} #{options.map {|o, v| v.present? ? "--#{o}=#{v.is_a?(Array) ? v.join(" ") : v.is_a?(Hash) ? v.map {|k1, v1| "#{k1}:#{v1}"}.join(" ") : v}" : ''}.join(" ")}\n".force_encoding("ASCII-8BIT")
       end
 
       def create_locale
@@ -96,7 +114,6 @@ module Spree
       end
 
       def create_deface_override
-        template 'overrides/add_scaffold_menu.html.erb.deface', "app/overrides/spree//admin/shared/_main_menu/add_scaffold_menu.html.erb.deface"
         template 'overrides/add_sub_menu.html.erb.deface', "app/overrides/spree/admin/shared/sub_menu/_scaffold/add_#{singular_name}_menu.html.erb.deface"
       end
 
@@ -109,6 +126,17 @@ module Spree
         append_file 'config/routes.rb', routes_text
       end
 
+      def create_gems
+        if locale? || i18n?
+          append_file 'Gemfile', %q{
+gem 'spree_i18n', github: 'spree-contrib/spree_i18n', branch: 'master'}
+        end
+        if i18n?
+          append_file 'Gemfile', %q{
+gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
+        end
+      end
+
       def create_readme
         readme "USAGE"
       end
@@ -116,19 +144,32 @@ module Spree
       protected
 
       def sortable?
-        self.attributes.find { |a| a.name == 'position' && a.type == :integer }
+        self.attributes.find {|a| a.name == 'position' && a.type == :integer}
       end
 
       def has_attachments?
-        self.attributes.find { |a| a.type == :image || a.type == :file }
+        self.attributes.find {|a| a.type == :image || a.type == :file}
       end
 
       def slugged?
-        self.attributes.find { |a| a.name == 'slug' && a.type == :string }
+        self.attributes.find {|a| a.name == 'slug' && a.type == :string}
+      end
+
+      def locale?
+        options[:locale].any?
       end
 
       def i18n?
         options[:i18n].any?
+      end
+
+      def enum_values(enum)
+        options[:enum][enum].split(",")
+      end
+
+      def enum_index(enum, value)
+        values = options[:enum][enum].split(",")
+        values.index(value)
       end
 
       private
@@ -140,8 +181,7 @@ module Spree
         File.readlines(log_path).each do |line|
           options[:nested].each do |nested|
             if line.include?("rails g spree:scaffold #{nested.singularize}")
-              puts("nested=#{nested}, attributes=#{line.gsub(("rails g spree:scaffold #{nested.singularize}"), "").gsub(/--.*/, "").split(" ").map{|s| {:name => s.split(":")[0], :type => s.split(":")[1].to_sym}}}")
-              @nested_hash[nested] = line.gsub(("rails g spree:scaffold #{nested.singularize}"), "").gsub(/--.*/, "").split(" ").map{|s| {:name => s.split(":")[0], :type => s.split(":")[1].to_sym}}
+              @nested_hash[nested] = line.gsub(("rails g spree:scaffold #{nested.singularize}"), "").gsub(/--.*/, "").split(" ").map {|s| {:name => s.split(":")[0], :type => s.split(":")[1].to_sym}}
             end
           end
         end

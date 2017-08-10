@@ -9,6 +9,7 @@ zh-TW:
       say_false: 否
       print: 列印
       batch: 批次列印
+      export: 匯出
       search_checked: "僅搜尋勾選項目:"
       menu: "新增功能"
       add_sub_item: "新增子項目"
@@ -19,6 +20,7 @@ zh-TW:
       check_reverse: 反
       check_none: 無
       report_search_criteria: 搜尋條件
+      actions: 動作
       conditions:
         eq: "等於"
         not_eq: "不等於"

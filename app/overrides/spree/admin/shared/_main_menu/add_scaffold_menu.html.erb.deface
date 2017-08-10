@@ -1,0 +1,8 @@
+<!-- insert_before "erb[silent]:contains('can? :admin, current_store && Spree::Config[:admin_show_version]')" -->
+<% if SpreeScaffold::Config[:show_scaffold_menu] %>
+<ul class="nav nav-sidebar">
+  <%= main_menu_tree Spree.t("scaffold.menu"), icon: "th-large", sub_menu: "scaffold", url: "#sidebar-scaffold" %>
+</ul>
+<% end %>
+<!-- # you can change the icon with any other icons from http://glyphicons.com-->
+

@@ -5,62 +5,80 @@
     <div class="col-md-6" data-hook="col-<%= attribute.name %>">
       <%%= f.field_container :<%= attribute.name %>, class: ['form-group'] do %>
   <% if options[:fk].values.include?(attribute.name) -%>
-      <% fk_class_name = "Spree::#{options[:fk].invert[attribute.name].camelcase}" -%>
+      <%- fk_class_name = "Spree::#{options[:fk].invert[attribute.name].camelcase}" -%>
         <%% if defined?(<%=fk_class_name%>) %>
             <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-            <%- if options[:presence].include?(attribute.name) %>
+            <%- if options[:presence].include?(attribute.name) -%>
               <abbr style="color: red">*</abbr>
-            <%- end %>
+            <%- end -%>
             <%%= f.select :<%= attribute.name %>, options_for_select(@select_<%=attribute.name%>.map { |s| [s.email, s.id] }, f.object.<%=attribute.name%>), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
         <%% end %>
-  <% elsif options[:enum].keys.include?(attribute.name) -%>
-      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%- if options[:presence].include?(attribute.name) %><abbr style="color: red">*</abbr><%- end %>
-      <%%= f.select :<%= attribute.name %>, options_for_select(Spree::<%=class_name%>.<%=attribute.name.pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name.pluralize%>.#{k}"), k]}, f.object.<%=attribute.name%>), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
-  <% elsif attribute.type == :image || attribute.type == :file -%>
+  <%- elsif options[:enum].keys.include?(attribute.name) -%>
         <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-        <%- if options[:presence].include?(attribute.name) %><abbr style="color: red">*</abbr><%- end %>
+        <%- if options[:presence].include?(attribute.name) -%>
+              <abbr style="color: red">*</abbr>
+        <%- end -%>
+        <%%= f.select :<%= attribute.name %>, options_for_select(Spree::<%=class_name%>.<%=attribute.name.pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name.pluralize%>.#{k}"), k]}, f.object.<%=attribute.name%>), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
+  <%- elsif attribute.type == :image || attribute.type == :file -%>
+        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+        <%- if options[:presence].include?(attribute.name) %>
+        <abbr style="color: red">*</abbr>
+        <%- end %>
         <%- if attribute.type == :image -%>
-            <%% if f.object.<%= attribute.name %>_file_name %>
+        <%% if f.object.<%= attribute.name %>_file_name %>
             <div><%%= image_tag f.object.<%= attribute.name %>.url(:small) -%></div>
-            <%% end %>
+        <%% end %>
         <%- elsif attribute.type == :file -%>
-            <%% if f.object.<%= attribute.name %>_file_name %>
+        <%% if f.object.<%= attribute.name %>_file_name %>
             <div><%%= link_to Spree.t(:download_file), f.object.<%= attribute.name %>.url, target: '_blank' %></div>
-            `<%% end %>
+        <%% end %>
         <%- end -%>
         <%%= f.file_field :<%= attribute.name %>, class: 'form-control' %>
-  <% elsif attribute.type == :boolean -%>
+  <%- elsif attribute.type == :boolean -%>
         <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-        <%- if options[:presence].include?(attribute.name) %><abbr style="color: red">*</abbr><%- end %>
+        <%- if options[:presence].include?(attribute.name) -%>
+        <abbr style="color: red">*</abbr>
+        <%- end -%>
         <div>
           <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%=attribute.name%>, 1, :checked => f.object.<%= attribute.name %> == true %>&nbsp;&nbsp;
           <%%=Spree.t("scaffold.say_no")%>: <%%= f.radio_button :<%=attribute.name%>, 0, :checked => f.object.<%= attribute.name %> == false %>&nbsp;&nbsp;
         </div>
-  <% elsif attribute.type == :datetime -%>
+  <%- elsif attribute.type == :datetime -%>
         <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-        <%- if options[:presence].include?(attribute.name) %><abbr style="color: red">*</abbr><%- end %>
+        <%- if options[:presence].include?(attribute.name) -%>
+        <abbr style="color: red">*</abbr>
+        <%- end -%>
         <%%= f.text_field :<%= attribute.name %>, value: datepicker_field_value(f.object.<%= attribute.name %>), class: 'datepicker form-control' %>
-  <% elsif attribute.type == :integer  -%>
+  <%- elsif attribute.type == :integer  -%>
         <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-        <%- if options[:presence].include?(attribute.name) %><abbr style="color: red">*</abbr><%- end %>
+        <%- if options[:presence].include?(attribute.name) -%>
+        <abbr style="color: red">*</abbr>
+        <%- end -%>
         <%%= f.number_field :<%= attribute.name %>,  class: 'form-control', step: 1 %>
-  <% elsif attribute.type == :polymorphic -%>
-          <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-          <%- if options[:presence].include?(attribute.name) %><abbr style="color: red">*</abbr><%- end %>
-          <%%= f.select :<%= attribute.name %>_id, options_for_select(@select_<%=attribute.name%>_id.map { |s| [s.id, s.id] }, f.object.<%=attribute.name%>_id), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
+  <%- elsif attribute.type == :polymorphic -%>
+        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+        <%- if options[:presence].include?(attribute.name) -%>
+        <abbr style="color: red">*</abbr>
+        <%- end -%>
+        <%%= f.select :<%= attribute.name %>_id, options_for_select(@select_<%=attribute.name%>_id.map { |s| [s.id, s.id] }, f.object.<%=attribute.name%>_id), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
   <% elsif attribute.type == :text  -%>
-      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%- if options[:presence].include?(attribute.name) %><abbr style="color: red">*</abbr><%- end %>
-      <%%= f.text_area :<%= attribute.name %>,  class: 'form-control' %>
+        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+        <%- if options[:presence].include?(attribute.name) -%>
+        <abbr style="color: red">*</abbr>
+        <%- end -%>
+        <%%= f.text_area :<%= attribute.name %>,  class: 'form-control' %>
   <% elsif attribute.type == :float  -%>
-      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%- if options[:presence].include?(attribute.name) %><abbr style="color: red">*</abbr><%- end %>
-      <%%= f.number_field :<%= attribute.name %>,  class: 'form-control', step: '0.01' %>
+        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+        <%- if options[:presence].include?(attribute.name) -%>
+        <abbr style="color: red">*</abbr>
+        <%- end -%>
+        <%%= f.number_field :<%= attribute.name %>,  class: 'form-control', step: '0.01' %>
   <% else -%>
-      <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%- if options[:presence].include?(attribute.name) %><abbr style="color: red">*</abbr><%- end %>
-      <%%= f.text_field :<%= attribute.name %>,  class: 'form-control' %>
+        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+        <%- if options[:presence].include?(attribute.name) -%>
+        <abbr style="color: red">*</abbr>
+        <%- end -%>
+        <%%= f.text_field :<%= attribute.name %>,  class: 'form-control' %>
   <% end -%>
         <%%= error_message_on :<%= singular_name %>, :<%= attribute.name %> %>
       <%% end %>

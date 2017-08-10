@@ -3,32 +3,40 @@ An advanced admin scaffold generator for Spree
 Creates a CRUD interface for whatever you want to use the Spree admin styling
 
 Example:
-    rails g spree:scaffold class_name name:string name2:string user_id:integer
-                                description:text image:image order_id:integer
-                                important:boolean task_date:datetime
-                                --search=name user_id important
-                                --locale=zh-TW:任務
-                                --fk=order:order_id user:user_id
-                                --presence name name2
-                                --unique name
+    rails g spree:scaffold vendor name:string user_id:integer vendor_type:integer description:text \
+                                count:integer image:image important:boolean join_date:datetime position:integer \
+                                --locale=zh-TW:任務,zh-CN:任务 \
+                                --enum=vendor_type:type1,type2,type3 \
+                                --default=important:false vendor_type:type2 \
+                                --fk=user:user_id \
+                                --search=name user_id important \
+                                --i18n=name description \
+                                --skip_timestamps=false \
+                                --presence=name \
+                                --unique=name \
+                                --nested=vendor_contacts \
+                                --cache=true
+    (make sure vendor_contact already exists if you use --nested, for example, run this first:
+        rails g spree:scaffold vendor_contact phone:string email:string vendor_id:integer)
+
     This will create:
-	    app/models/class_name.rb
-	    app/controllers/admin/class_names_controller.rb
-	    app/views/admin/class_names/index.html.erb
-	    app/views/admin/class_names/new.html.erb
-	    app/views/admin/class_names/edit.html.erb
-	    app/views/admin/class_names/_form.html.erb
-	    app/views/admin/class_names/show.html.erb
-	    app/views/admin/class_names/index.pdf.erb
-	    app/views/admin/class_names/batch.pdf.erb
-	    app/views/admin/class_names/show.pdf.erb
-	    app/views/admin/class_names/_object.pdf.erb
-	    app/views/api/vi/class_names/index.v1.rabl
-	    app/views/api/vi/class_names/show.v1.rabl
-	    db/migrate/TIMESTAMP_create_class_names.rb
-        db/samples/class_names.rb
-        lib/class_names/class_name.rake
-	    config/locales/class_names.en.yml
-	    config/locales/class_names.zh-TW.yml
-	    config/locales/spree_scaffold.en.yml
-	    config/locales/spree_scaffold.zh-TW.yml
+	    app/models/spree/vendor.rb
+	    app/controllers/spree/admin/vendors_controller.rb
+	    app/controllers/spree/api/v1/vendors_controller.rb
+	    app/views/spree/admin/vendors/index.html.erb
+	    app/views/spree/admin/vendors/new.html.erb
+	    app/views/spree/admin/vendors/edit.html.erb
+	    app/views/spree/admin/vendors/_form.html.erb
+	    app/views/spree/admin/vendors/show.html.erb
+	    app/views/spree/admin/vendors/index.pdf.erb
+	    app/views/spree/admin/vendors/batch.pdf.erb
+	    app/views/spree/admin/vendors/show.pdf.erb
+	    app/views/spree/admin/vendors/_object.pdf.erb
+	    app/views/api/spree/vi/vendors/index.v1.rabl
+	    app/views/api/spree/vi/vendors/show.v1.rabl
+	    db/migrate/TIMESTAMP_create_spree_vendors.rb
+        db/samples/vendors.rb
+        lib/tasks/vendors.rake
+	    config/locales/vendors.en.yml
+	    config/locales/vendors.zh-TW.yml
+

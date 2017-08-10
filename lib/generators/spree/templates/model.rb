@@ -1,7 +1,7 @@
 module Spree
   class <%= class_name %> < Spree::Base
 <% if sortable? -%>
-    default_scope { order(:position).order("id desc") }
+    default_scope { order("position asc") }
 <% else -%>
     default_scope -> {order("id desc")}
 <% end -%>
@@ -14,13 +14,13 @@ module Spree
 <% end -%>
 <% if i18n? -%>
     if defined?(SpreeGlobalize)
-        translates <%= options[:i18n].map { |f| ":#{f}" }.join(', ') %>
-        include SpreeGlobalize::Translatable
+      translates <%= options[:i18n].map { |f| ":#{f}" }.join(', ') %>
+      include SpreeGlobalize::Translatable
     end
-<% end -%>
-<% if attributes.map(&:name).include?("deleted_at") -%>
+<%- end -%>
+<%- if attributes.map(&:name).include?("deleted_at") -%>
     acts_as_paranoid
-<% end -%>
+<%- end -%>
 <% attributes.each do |attribute| -%>
 <% if attribute.type == :image -%>
     has_attached_file :<%= attribute.name %>,
@@ -78,76 +78,76 @@ module Spree
 
     def self.csv_headers
       headers = [<%=attributes.map{|attribute| "'#{attribute.name}'"}.join(',')%>]
-    headers.map {|header| I18n.t("activerecord.attributes.spree/<%= singular_name %>.#{header}")}
-          end
+      headers.map {|header| I18n.t("activerecord.attributes.spree/<%= singular_name %>.#{header}")}
+    end
 
-      def self.csv_columns(<%= singular_name %>)
-    [<%=attributes.map{|attribute| "#{singular_name}.#{attribute.name}"}.join(',')%>]
-      end
+    def self.csv_columns(<%= singular_name %>)
+      [<%=attributes.map{|attribute| "#{singular_name}.#{attribute.name}"}.join(',')%>]
+    end
 
-      def self.to_csv(options={}, params={})
-        require 'csv'
-        CSV.generate(options) do |csv|
-          if params[:q]
-            params[:q].delete(:s)
+    def self.to_csv(options={}, params={})
+      require 'csv'
+      CSV.generate(options) do |csv|
+        if params[:q]
+          params[:q].delete(:s)
+          conditions = []
+          conditions.push(Spree.t("scaffold.report_search_criteria"))
+          csv << conditions
+          params[:q].each do |key, value|
             conditions = []
-            conditions.push(Spree.t("scaffold.report_search_criteria"))
-            csv << conditions
-            params[:q].each do |key, value|
-              conditions = []
-              if value.present?
-                with_type = get_condition_type(key)
-                if with_type[:type] == :boolean
-                  value = Spree.t("scaffold.say_#{value.to_bool}")
-                end
-                conditions.push("#{I18n.t("activerecord.attributes.spree/<%= singular_name %>.#{key}")}#{with_type[:condition] ? Spree.t("scaffold.conditions.#{with_type[:condition]}") : ''}")
-                conditions.push(value)
-                csv << conditions
+            if value.present?
+              with_type = get_condition_type(key)
+              if with_type[:type] == :boolean
+                value = Spree.t("scaffold.say_#{value.to_bool}")
               end
+              conditions.push("#{I18n.t("activerecord.attributes.spree/<%= singular_name %>.#{key}")}#{with_type[:condition] ? Spree.t("scaffold.conditions.#{with_type[:condition]}") : ''}")
+              conditions.push(value)
+              csv << conditions
             end
           end
+        end
 
-          headers = []
-          csv_headers.each {|header| headers.push(header)}
-          csv << headers
+        headers = []
+        csv_headers.each {|header| headers.push(header)}
+        csv << headers
 
-          all.each do |object|
-            columns = []
-            csv_columns(object).each do |column|
-              columns.push(column)
-            end
-            csv << columns
+        all.each do |object|
+          columns = []
+          csv_columns(object).each do |column|
+            columns.push(column)
           end
+          csv << columns
         end
       end
+    end
 
-      def self.get_condition_type(condition_name)
-        conditions = ["eq", "not_eq","lt", "gt", "lteq", "gteq",
-                      "in", "not_in", "cont", "not_cont", "cont_any",
-                      "not_cont_any","cont_all", "not_cont_all",
-                      "start", "not_start", "end", "not_end",
-                      "true", "not_true" ,"false", "not_false",
-                      "present", "blank", "null", "not_null"]
-        with_type = {}
-        conditions.each do |condition|
-          Rails.logger.debug("condition_name=#{condition_name}")
-          if condition_name.end_with?("_#{condition}")
-            condition_name = condition_name.gsub("_#{condition}")
-            with_type = {:type => columns_hash[condition_name].type, :condition => condition}
-          end
+    def self.get_condition_type(condition_name)
+      conditions = ["eq", "not_eq","lt", "gt", "lteq", "gteq",
+                    "in", "not_in", "cont", "not_cont", "cont_any",
+                    "not_cont_any","cont_all", "not_cont_all",
+                    "start", "not_start", "end", "not_end",
+                    "true", "not_true" ,"false", "not_false",
+                    "present", "blank", "null", "not_null"]
+      with_type = {}
+      conditions.each do |condition|
+        Rails.logger.debug("condition_name=#{condition_name}")
+        if condition_name.end_with?("_#{condition}")
+          condition_name = condition_name.gsub("_#{condition}")
+          with_type = {:type => columns_hash[condition_name].type, :condition => condition}
         end
-        if condition_name.end_with?("_is_null") || condition_name.end_with?("_not_null")
-          with_type = :boolean
-        end
-        with_type
       end
+      if condition_name.end_with?("_is_null") || condition_name.end_with?("_not_null")
+        with_type = :boolean
+      end
+      with_type
+    end
 
 
 <% if options[:cache] -%>
     after_save :reload_cache
 
     def self.cached
-      Rails.cache.fetch("#{Rails.application.class.parent_name}_<%= class_name.underscore %>") do
+      Rails.cache.fetch("#{Rails.application.class.parent_name.underscore}_<%= class_name.underscore %>") do
         all
       end
     end
@@ -162,7 +162,7 @@ module Spree
 
 <% if options[:cache] -%>
     def reload_cache
-      Rails.cache.delete("#{Rails.application.class.parent_name}_<%= class_name.underscore %>")
+      Rails.cache.delete("#{Rails.application.class.parent_name.underscore}_<%= class_name.underscore %>")
       cached
     end
 <% end -%>

@@ -9,6 +9,7 @@ en:
       say_false: no
       print: print
       batch: batch
+      export: export
       search_checked: "checked only:"
       menu: "new functions"
       add_sub_item: "add sub item"
@@ -19,6 +20,7 @@ en:
       check_reverse: Rev
       check_none: None
       report_search_criteria: "search criteria"
+      actions: actions
       conditions:
         eq: "equal to"
         not_eq: "not equal to"

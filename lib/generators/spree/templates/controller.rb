@@ -1,7 +1,7 @@
 module Spree
   module Admin
     class <%= class_name.pluralize %>Controller < ResourceController
-      helper_method :batch_url, :batch_check_url
+      helper_method :batch_url, :batch_check_url, :add_check_url, :checks, :checks=
       respond_to :html, :json, :pdf
       include ::PdfHelper
       helper ::WickedPdfHelper::Assets
@@ -23,18 +23,18 @@ module Spree
       end
 
       def index
-        respond_with(@collection) do |format|
+        respond_to do |format|
           format.html
           format.pdf do
             render_with_wicked_pdf :pdf => "<%=plural_name%>_#{Time.now.to_i.to_s}",
                                    :show_as_html => params[:debug],
-                                   :layout => "layouts/pdf.pdf"
+                                   :layout => "spree/layouts/pdf.pdf"
           end
           format.csv {
             data = @collection.to_csv({}, params.to_unsafe_h)
             require 'iconv'
-            big5_data = Iconv.new("big5//IGNORE", "utf-8").iconv(data)
-            send_data big5_data, :filename => "<%=plural_name%>_#{Time.now.to_i.to_s}.csv",
+            data = Iconv.new("big5//IGNORE", "utf-8").iconv(data) #remove this if you won't use excel to open csv in traditional Chinese
+            send_data data, :filename => "<%=plural_name%>_#{Time.now.to_i.to_s}.csv",
                       :disposition => 'inline', :type => "text/csv"
           }
         end
@@ -42,7 +42,7 @@ module Spree
 
       def batch
         collection
-        respond_with(@collection) do |format|
+        respond_to do |format|
           format.html
           format.pdf do
             render_with_wicked_pdf :pdf => "<%=plural_name%>_#{@collection.size}_#{Time.now.to_i.to_s}",
@@ -78,7 +78,7 @@ module Spree
       end
 
       def show
-        respond_with(@object) do |format|
+        respond_to do |format|
           format.html
           format.pdf do
             render_with_wicked_pdf :pdf => "<%=singular_name%>_#{@object.id}", :show_as_html => params[:debug]
@@ -87,22 +87,21 @@ module Spree
       end
 
       def seacher
-          params[:q] ||= {}
-          params[:q][:s] ||= 'created_at desc'
-          if !params[:q][:created_at_gt].blank?
-            params[:q][:created_at_gt] = Time.zone.parse(params[:q][:created_at_gt]).beginning_of_day rescue ""
-          end
+        params[:q] ||= {}
+        if !params[:q][:created_at_gt].blank?
+          params[:q][:created_at_gt] = Time.zone.parse(params[:q][:created_at_gt]).beginning_of_day rescue ""
+        end
 
-          if !params[:q][:created_at_lt].blank?
-            params[:q][:created_at_lt] = Time.zone.parse(params[:q][:created_at_lt]).end_of_day rescue ""
-          end
-          base_search = method(:collection).super_method.call
-          base_search.includes(<%=options[:fk].keys.map{|fk| fk.to_sym}%>)
-          if params[:q][:checked] == "true"
-            base_search.ransack(params[:q].merge(:id_in => session[:<%=plural_name%>_checked]))
-          else
-            base_search.ransack(params[:q])
-          end
+        if !params[:q][:created_at_lt].blank?
+          params[:q][:created_at_lt] = Time.zone.parse(params[:q][:created_at_lt]).end_of_day rescue ""
+        end
+        base_search = method(:collection).super_method.call
+        base_search.includes(<%=options[:fk].keys.map{|fk| fk.to_sym}%>)
+        if params[:q][:checked] == "true"
+          base_search.ransack(params[:q].merge(:id_in => session[:<%=plural_name%>_checked]))
+        else
+          base_search.ransack(params[:q])
+        end
       end
 
       def collection
@@ -124,6 +123,18 @@ module Spree
 
       def batch_check_url(options = {})
         batch_checked_admin_<%=plural_name%>_url(options)
+      end
+
+      def add_check_url(options = {})
+        add_checked_admin_<%= singular_name %>_url(options)
+      end
+
+      def checks
+        session[:<%=plural_name%>_checked] ||= []
+      end
+
+      def checks=chs
+        session[:<%=plural_name%>_checked] = chs
       end
 
       private

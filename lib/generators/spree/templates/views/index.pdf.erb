@@ -1,51 +1,35 @@
-<!doctype html>
-<html>
-<head>
-    <meta charset='utf-8'/>
-    <%%= wicked_pdf_stylesheet_link_tag 'spree/frontend/all' %>
-    <style>
-        .page-break {
-            display: block;
-            clear: both;
-            page-break-after: always;
-        }
-    </style>
-</head>
-<body>
-<div id="header">
-  <h2>  <%%= Spree.t(:listing_<%= plural_name %>) %> </h2>
-</div>
 <div id="content">
-  <table class="table" id="listing_<%= plural_name %>" data-hook>
+  <table class="table">
     <thead>
     <tr data-hook="admin_<%= plural_name %>_index_headers">
+  <%- if sortable? -%>
+      <th class="no-border"></th>
+  <%- end -%>
       <%- attributes.each do |attribute| -%>
-      <%- if (attribute.type == :string && attribute.name != "slug") || attribute.type == :boolean || (attribute.type == :integer && !(options[:fk].values.include?(attribute.name))) || attribute.type == :datetime  -%>
-          <th><%%= t(:<%= attribute.name %>, scope: 'activerecord.attributes.spree/<%= singular_name %>') %></th>
-      <%- end -%>
+          <%- if (attribute.type == :string && attribute.name != "slug") || attribute.type == :boolean || (attribute.type == :integer && attribute.name != "position" && !(options[:fk].values.include?(attribute.name))) || attribute.type == :datetime || attribute.type == :image  -%>
+            <th><%%=t(:<%= attribute.name %>, scope: 'activerecord.attributes.spree/<%= singular_name %>')%></th>
+          <%- end -%>
       <%- end -%>
     </tr>
     </thead>
     <tbody>
-    <%% @<%= plural_name %>.each do |<%= singular_name %>| %>
+  <%% @<%= plural_name %>.each do |<%= singular_name %>| %>
     <tr id="<%%= spree_dom_id <%= singular_name %> %>" data-hook="admin_<%= plural_name %>_index_rows" class="<%%= cycle('odd', 'even')%>">
-      <% attributes.each do |attribute| -%>
-          <% if options[:enum].include?(attribute.name) -%>
-              <td><%%=I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name.pluralize%>.#{<%=singular_name%>.<%=attribute.name%>}")%></td>
-          <% elsif (attribute.type == :string && attribute.name != "slug") || (attribute.type == :integer && !(options[:fk].values.include?(attribute.name))) -%>
-              <td><%%= <%= singular_name %>.<%= attribute.name %>.to_s %></td>
-          <% elsif attribute.type == :boolean -%>
-              <td><%%= Spree.t("scaffold.say_#{<%= singular_name %>.<%= attribute.name %>}") %></td>
-          <% elsif attribute.type == :datetime -%>
-              <td><%%= l(<%= singular_name %>.<%= attribute.name %>) if <%= singular_name %>.<%= attribute.name %> %></td>
-          <% end -%>
-      <% end -%>
+    <%- attributes.each do |attribute| -%>
+      <%- if options[:enum].include?(attribute.name) -%>
+          <td><%%=I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name.pluralize%>.#{<%=singular_name%>.<%=attribute.name%>}")%></td>
+      <%- elsif (attribute.type == :string && attribute.name != "slug") || (attribute.type == :integer && attribute.name != "position" && !(options[:fk].values.include?(attribute.name))) -%>
+          <td><%%= <%= singular_name %>.<%= attribute.name %>.to_s %></td>
+      <%- elsif attribute.type == :boolean -%>
+          <td><%%= Spree.t("scaffold.say_#{<%= singular_name %>.<%= attribute.name %>}") %></td>
+      <%- elsif attribute.type == :datetime -%>
+          <td><%%= l(<%= singular_name %>.<%= attribute.name %>.to_date) if <%= singular_name %>.<%= attribute.name %>.present? %></td>
+      <%- elsif attribute.type == :image -%>
+          <td><%%= wicked_pdf_image_tag(<%= singular_name %>.<%= attribute.name %>.url(:mini))if <%= singular_name %>.<%= attribute.name %>_file_name.present? %></td>
+      <%- end -%>
+    <%- end -%>
     </tr>
-    <%% end %>
+  <%% end %>
     </tbody>
   </table>
 </div>
-<div id="footer">
-</div>
-</body>
-</html>
