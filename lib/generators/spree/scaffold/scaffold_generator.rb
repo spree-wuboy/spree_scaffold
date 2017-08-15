@@ -82,6 +82,10 @@ module Spree
           inject_into_file "app/assets/javascripts/spree/backend/all.js", "//= require spree/backend/spree_globalize\n", before: /\/\/= require_tree/
           inject_into_file 'app/assets/stylesheets/spree/backend/all.css', " *= require spree/backend/spree_globalize\n", before: / \*= require_tree/
         end
+
+        if nested?
+          inject_into_file "app/assets/javascripts/spree/backend/all.js", "//= require spree/backend/spree_scaffold\n", before: /\/\/= require_tree/
+        end
       end
 
       def create_samples
@@ -161,6 +165,10 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
 
       def i18n?
         options[:i18n].any?
+      end
+
+      def nested?
+        options[:nested].any?
       end
 
       def enum_values(enum)

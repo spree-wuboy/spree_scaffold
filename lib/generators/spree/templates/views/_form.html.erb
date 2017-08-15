@@ -97,62 +97,62 @@
         </span>
           <table class="index table-condensed table-bordered sortable table" data-sortable-link="<%%= <%= "update_positions_admin_#{nested}_url" %> %>">
             <thead data-hook="<%=nested.singularize%>_header">
-            <tr>
+              <tr>
               <%- if @nested_hash[nested].map{|h| h[:name]}.include?("position") -%>
-                <th></th>
+                <th class="no-border"></th>
               <%- end -%>
-              <%- @nested_hash[nested].map{|h| h[:name]}.each do |name| -%>
-                  <%- if name != 'position' && name != "#{singular_name}_id" -%>
-                      <th>
-                        <%%= label_tag I18n.t(:<%=name%>, :scope => 'activerecord.attributes.spree/<%=nested.singularize%>') %>
-                      </th>
-                  <%- end -%>
-              <%- end -%>
-              <th class="actions"></th>
-            </tr>
+          <%- @nested_hash[nested].map{|h| h[:name]}.each do |name| -%>
+            <%- if name != 'position' && name != "#{singular_name}_id" -%>
+                <th>
+                  <%%= label_tag I18n.t(:<%=name%>, :scope => 'activerecord.attributes.spree/<%=nested.singularize%>') %>
+                </th>
+            <%- end -%>
+          <%- end -%>
+                <th class="actions"></th>
+              </tr>
             </thead>
             <tbody id="<%=nested%>-tbody">
             <%%= f.fields_for :<%=nested%> do |<%=nested%>_form| %>
-            <tr id="<%%=<%=nested%>_form.object.new_record? ? "<%=nested%>-template" : ""%>" class="<%%= cycle('odd', 'even') %> <%%=<%=nested%>_form.object.new_record? ? "nested-template" : ""%>">
+              <tr id="<%%=<%=nested%>_form.object.new_record? ? "<%=nested%>-template" : spree_dom_id(<%=nested%>_form.object)%>" class="<%%= cycle('odd', 'even') %> <%%=<%=nested%>_form.object.new_record? ? "nested-template" : ""%>">
               <%- if @nested_hash[nested].map{|h| h[:name]}.include?("position") -%>
-                  <td>
-                  <%% if f.object.id %>
+                <td>
+                <%% if f.object.id %>
                   <span class="icon icon-move handle"></span>
-                  <%% end %>
-                  </td>
+                <%% end %>
+                </td>
               <%- end -%>
-              <%- @nested_hash[nested].each do |hash| -%>
-                  <%- if hash[:name] == "#{singular_name}_id" || hash[:name] == 'position' -%>
-                  <%- elsif options[:enum].keys.include?(hash[:name]) -%>
-                      <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.select :<%= hash[:name] %>, options_for_select(Spree::<%=nested.singularize.camelcase%>.<%=hash[:name].pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=nested.singularize%>.<%=hash[:name].pluralize%>.#{k}"), k]}, f.object.<%=hash[:name]%>), {<%=options[:presence].include?(hash[:name]) ? "" : "include_blank: true"%>}, {class: 'form-control'} %></td>
-                  <%- elsif hash[:type] == :image || hash[:type] == :file -%>
-                      <td data-hook="col-<%= hash[:name] %>">
-                        <%- if hash[:type] == :image -%>
-                            <%% if <%=nested%>_form.object.<%= hash[:name] %>_file_name %>
-                            <div><%%= image_tag <%=nested%>_form.object.<%= hash[:name] %>.url(:mini) -%></div>
-                            <%% end %>
-                        <%- elsif hash[:type] == :file -%>
-                            <%% if <%=nested%>_form.object.<%= hash[:name] %>_file_name %>
-                            <div><%%= link_to Spree.t(:download_file), <%=nested%>_form.object.<%= hash[:name] %>.url, target: '_blank' %></div>
-                            `<%% end %>
-                        <%- end -%>
-                        <%%= <%=nested%>_form.file_field :<%= hash[:name] %>, class: 'form-control' %>
-                      </td>
-                  <%- elsif hash[:type] == :boolean -%>
-                      <td data-hook="col-<%= hash[:name] %>">
-                        <%%=Spree.t("scaffold.say_yes")%>: <%%= <%=nested%>_form.radio_button :<%=hash[:name]%>, 1, :checked => <%=nested%>_form.object.<%= hash[:name] %> == true %>&nbsp;&nbsp;
-                        <%%=Spree.t("scaffold.say_no")%>: <%%= <%=nested%>_form.radio_button :<%=hash[:name]%>, 0, :checked => <%=nested%>_form.object.<%= hash[:name] %> == false %>&nbsp;&nbsp;
-                      </td>
-                  <%- elsif hash[:type] == :datetime -%>
-                      <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.text_field :<%= hash[:name] %>, value: datepicker_field_value(<%=nested%>_form.object.<%= hash[:name] %>), class: 'datepicker form-control' %></td>
-                  <%- elsif hash[:type] == :integer -%>
-                      <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control', step: 1 %></td>
-                  <%- elsif hash[:type] == :float -%>
-                      <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control' %></td>
-                  <%- else -%>
-                      <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.text_field :<%= hash[:name] %>,  class: 'form-control' %></td>
+        <%- @nested_hash[nested].each do |hash| -%>
+            <%- if hash[:name] == "#{singular_name}_id" || hash[:name] == 'position' -%>
+            <%- elsif options[:enum].keys.include?(hash[:name]) -%>
+                <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.select :<%= hash[:name] %>, options_for_select(Spree::<%=nested.singularize.camelcase%>.<%=hash[:name].pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=nested.singularize%>.<%=hash[:name].pluralize%>.#{k}"), k]}, f.object.<%=hash[:name]%>), {<%=options[:presence].include?(hash[:name]) ? "" : "include_blank: true"%>}, {class: 'form-control'} %></td>
+            <%- elsif hash[:type] == :image || hash[:type] == :file -%>
+                <td data-hook="col-<%= hash[:name] %>">
+                  <%- if hash[:type] == :image -%>
+                      <%% if <%=nested%>_form.object.<%= hash[:name] %>_file_name %>
+                      <div><%%= image_tag <%=nested%>_form.object.<%= hash[:name] %>.url(:mini) -%></div>
+                      <%% end %>
+                  <%- elsif hash[:type] == :file -%>
+                      <%% if <%=nested%>_form.object.<%= hash[:name] %>_file_name %>
+                      <div><%%= link_to Spree.t(:download_file), <%=nested%>_form.object.<%= hash[:name] %>.url, target: '_blank' %></div>
+                      `<%% end %>
                   <%- end -%>
-              <%- end -%>
+                  <%%= <%=nested%>_form.file_field :<%= hash[:name] %>, class: 'form-control' %>
+                </td>
+            <%- elsif hash[:type] == :boolean -%>
+                <td data-hook="col-<%= hash[:name] %>">
+                  <%%=Spree.t("scaffold.say_yes")%>: <%%= <%=nested%>_form.radio_button :<%=hash[:name]%>, 1, :checked => <%=nested%>_form.object.<%= hash[:name] %> == true %>&nbsp;&nbsp;
+                  <%%=Spree.t("scaffold.say_no")%>: <%%= <%=nested%>_form.radio_button :<%=hash[:name]%>, 0, :checked => <%=nested%>_form.object.<%= hash[:name] %> == false %>&nbsp;&nbsp;
+                </td>
+            <%- elsif hash[:type] == :datetime -%>
+                <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.text_field :<%= hash[:name] %>, value: datepicker_field_value(<%=nested%>_form.object.<%= hash[:name] %>), class: 'datepicker form-control' %></td>
+            <%- elsif hash[:type] == :integer -%>
+                <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control', step: 1 %></td>
+            <%- elsif hash[:type] == :float -%>
+                <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control' %></td>
+            <%- else -%>
+                <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.text_field :<%= hash[:name] %>,  class: 'form-control' %></td>
+            <%- end -%>
+        <%- end -%>
               <td class="actions">
                 <%%= <%=nested%>_form.hidden_field :id %>
                 <%%= link_to_with_icon('delete', '', '#', :class => "spree_remove_sub_fields btn btn-sm btn-default", :title => Spree.t(:remove)) %>
@@ -164,66 +164,3 @@
         </div>
     <% end -%>
 <% end -%>
-
-<%- if options[:nested].any? -%>
-<script>
-  $(document).ready(function() {
-    $(".nested-template").hide().find("input, select, textarea").prop( "disabled", true )
-
-  });
-  var subFieldId = 0;
-  $('.spree_add_sub_fields').click(function () {
-    var target = $(this).data("target");
-    var new_table_row = $("#" + target + "-template").clone();
-    var appender =  $("#" + target + "-tbody");
-    new_table_row.show().find("input, select, textarea").prop( "disabled", false );
-    var new_id = new Date().getTime() + (subFieldId++);
-    new_table_row.find("input, select").each(function () {
-      var el = $(this);
-      el.prop("id", el.prop("id").replace(/\d+/, new_id))
-      el.prop("name", el.prop("name").replace(/\d+/, new_id))
-    })
-    // When cloning a new row, set the href of all icons to be an empty "#"
-    // This is so that clicking on them does not perform the actions for the
-    // duplicated row
-    new_table_row.find("a").each(function () {
-      var el = $(this);
-      el.prop('href', '#');
-    })
-    appender.append(new_table_row);
-  });
-
-  $('body').on('click', 'a.spree_remove_sub_fields', function() {
-    el = $(this);
-
-    if ( el.parents("table").find('a.spree_remove_sub_fields').length == 1) {
-      el.parents("tr").find("input").val("");
-    } else {
-      el.closest(".fields").hide();
-      if (el.prop("href").substr(-1) == '#') {
-        el.parents("tr").fadeOut('hide', function () {
-          var name = $(this).find("[name$='[id]']").attr("name").replace("[id]", "") + "[_destroy]"
-          $(this).append($("<input type='hidden' name='" + name + "' value='1'/>"));
-        });
-      } else if (el.prop("href")) {
-        $.ajax({
-          type: 'POST',
-          url: el.prop("href"),
-          data: {
-            _method: 'delete',
-            authenticity_token: AUTH_TOKEN
-          },
-          success: function (response) {
-            el.parents("tr").fadeOut('hide');
-          },
-          error: function (response, textStatus, errorThrown) {
-            show_flash('error', response.responseText);
-          }
-
-        })
-      }
-    }
-    return false;
-  });
-</script>
-<%- end -%>

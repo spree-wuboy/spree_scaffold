@@ -148,7 +148,7 @@ module Spree
 
     def self.cached
       Rails.cache.fetch("#{Rails.application.class.parent_name.underscore}_<%= class_name.underscore %>") do
-        all
+        <%=nested? ? "includes(#{options[:nested].map{|n| ":#{n}"}.join(",")}).all" : "all"%>
       end
     end
 

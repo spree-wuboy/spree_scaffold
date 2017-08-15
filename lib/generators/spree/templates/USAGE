@@ -5,7 +5,7 @@ Creates a CRUD interface for whatever you want to use the Spree admin styling
 Example:
     rails g spree:scaffold vendor name:string user_id:integer vendor_type:integer description:text \
                                 count:integer image:image important:boolean join_date:datetime position:integer \
-                                --locale=zh-TW:任務,zh-CN:任务 \
+                                --locale=zh-TW:供應商 zh-CN:供应商 \
                                 --enum=vendor_type:type1,type2,type3 \
                                 --default=important:false vendor_type:type2 \
                                 --fk=user:user_id \
