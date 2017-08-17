@@ -2,7 +2,13 @@ zh-TW:
   spree:
     updated_at: "更新於"
     scaffold:
+      new: 新增
+      edit: 編輯
+      list: 列表
+      include_all_or_check: "包含全部搜尋結果或僅含勾選的資料 (確定: 全部, 取消: 僅勾選)"
+      include_all_or_check_count: "包含全部搜尋結果或僅含勾選的資料 (確定: 全部%{all_count}筆, 取消: 僅勾選%{check_count}筆)"
       none: 無
+      say_: ''
       say_yes: 是
       say_no: 否
       say_true: 是
@@ -10,7 +16,8 @@ zh-TW:
       print: 列印
       batch: 批次列印
       export: 匯出
-      search_checked: "僅搜尋勾選項目:"
+      search_checked: "僅搜尋勾選項目"
+      search_checked_count: "僅搜尋%{count}筆勾選項目"
       menu: "新增功能"
       add_sub_item: "新增子項目"
       back_to_resources_list: "回列表"
@@ -22,29 +29,29 @@ zh-TW:
       report_search_criteria: 搜尋條件
       actions: 動作
       conditions:
-        eq: "等於"
-        not_eq: "不等於"
-        lt: "小於"
-        gt: "大於"
-        lteq: "小於等於"
-        gteq: "大於等於"
-        in: "在其中"
-        not_in: "不在其中"
-        cont: "包含"
-        not_cont: "不包含"
-        cont_any: "包含任一"
-        not_cont_any: "不包含任一"
-        cont_all: "包含所有"
-        not_cont_all: "不包含所有"
-        start: "以此開頭"
-        not_start: "不以此開頭"
-        end: "以此結尾"
-        not_end: "不以此結尾"
-        true: "是"
-        not_true: "否或空值"
-        false: "否"
-        not_false: "是或空值"
-        present: "有值"
-        blank: "沒有值"
-        null: "為空"
-        not_null: "不為空"
+        condition_eq: "等於"
+        condition_not_eq: "不等於"
+        condition_lt: "小於"
+        condition_gt: "大於"
+        condition_lteq: "小於等於"
+        condition_gteq: "大於等於"
+        condition_in: "在其中"
+        condition_not_in: "不在其中"
+        condition_cont: "包含"
+        condition_not_cont: "不包含"
+        condition_cont_any: "包含任一"
+        condition_not_cont_any: "不包含任一"
+        condition_cont_all: "包含所有"
+        condition_not_cont_all: "不包含所有"
+        condition_start: "以此開頭"
+        condition_not_start: "不以此開頭"
+        condition_end: "以此結尾"
+        condition_not_end: "不以此結尾"
+        condition_true: "是"
+        condition_not_true: "否或空值"
+        condition_false: "否"
+        condition_not_false: "是或空值"
+        condition_present: "有值"
+        condition_blank: "沒有值"
+        condition_null: "為空"
+        condition_not_null: "不為空"

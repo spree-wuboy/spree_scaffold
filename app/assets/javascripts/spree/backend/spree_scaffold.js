@@ -1,4 +1,7 @@
+//= require spree/backend/jquery_ujs.prompt
+
 $(document).ready(function() {
+
     $(".nested-template").hide().find("input, select, textarea").prop( "disabled", true )
     var subFieldId = 0;
     $('.spree_add_sub_fields').click(function () {

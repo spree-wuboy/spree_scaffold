@@ -2,7 +2,7 @@ zh-TW:
   spree:
     admin:
       tab:
-        <%= plural_name %>: "<%= @name || class_name.pluralize.titleize %>"
+        <%= plural_name %>: "<%= @name || class_name.pluralize.titleize %>管理"
     new_<%= singular_name %>: "新增<%= @name || class_name.titleize %>"
     listing_<%= plural_name %>: "<%= @name || class_name.pluralize.titleize %>列表"
     editing_<%= singular_name %>: "編輯<%= @name || class_name.titleize %>"

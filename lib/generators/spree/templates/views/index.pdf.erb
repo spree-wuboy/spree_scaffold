@@ -5,31 +5,31 @@
   <%- if sortable? -%>
       <th class="no-border"></th>
   <%- end -%>
-      <%- attributes.each do |attribute| -%>
-          <%- if (attribute.type == :string && attribute.name != "slug") || attribute.type == :boolean || (attribute.type == :integer && attribute.name != "position" && !(options[:fk].values.include?(attribute.name))) || attribute.type == :datetime || attribute.type == :image  -%>
-            <th><%%=t(:<%= attribute.name %>, scope: 'activerecord.attributes.spree/<%= singular_name %>')%></th>
-          <%- end -%>
-      <%- end -%>
+  <%- attributes.each do |attribute| -%>
+    <%- if (attribute.type == :string && attribute.name != "slug") || attribute.type == :boolean || (attribute.type == :integer && attribute.name != "position" && !(options[:fk].values.include?(attribute.name))) || attribute.type == :datetime || attribute.type == :image  -%>
+      <th><%%=t(:<%= attribute.name %>, scope: 'activerecord.attributes.spree/<%= singular_name %>')%></th>
+    <%- end -%>
+  <%- end -%>
     </tr>
     </thead>
     <tbody>
-  <%% @<%= plural_name %>.each do |<%= singular_name %>| %>
-    <tr id="<%%= spree_dom_id <%= singular_name %> %>" data-hook="admin_<%= plural_name %>_index_rows" class="<%%= cycle('odd', 'even')%>">
-    <%- attributes.each do |attribute| -%>
-      <%- if options[:enum].include?(attribute.name) -%>
-          <td><%%=I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name.pluralize%>.#{<%=singular_name%>.<%=attribute.name%>}")%></td>
-      <%- elsif (attribute.type == :string && attribute.name != "slug") || (attribute.type == :integer && attribute.name != "position" && !(options[:fk].values.include?(attribute.name))) -%>
-          <td><%%= <%= singular_name %>.<%= attribute.name %>.to_s %></td>
-      <%- elsif attribute.type == :boolean -%>
-          <td><%%= Spree.t("scaffold.say_#{<%= singular_name %>.<%= attribute.name %>}") %></td>
-      <%- elsif attribute.type == :datetime -%>
-          <td><%%= l(<%= singular_name %>.<%= attribute.name %>.to_date) if <%= singular_name %>.<%= attribute.name %>.present? %></td>
-      <%- elsif attribute.type == :image -%>
-          <td><%%= wicked_pdf_image_tag(<%= singular_name %>.<%= attribute.name %>.url(:mini))if <%= singular_name %>.<%= attribute.name %>_file_name.present? %></td>
-      <%- end -%>
+    <%% @collection.each do |<%= singular_name %>| %>
+      <tr id="<%%= spree_dom_id <%= singular_name %> %>" data-hook="admin_<%= plural_name %>_index_rows" class="<%%= cycle('odd', 'even')%>">
+  <%- attributes.each do |attribute| -%>
+    <%- if options[:enum].include?(attribute.name) -%>
+        <td><%%=I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name.pluralize%>.#{<%=singular_name%>.<%=attribute.name%>}")%></td>
+    <%- elsif (attribute.type == :string && attribute.name != "slug") || (attribute.type == :integer && attribute.name != "position" && !(options[:fk].values.include?(attribute.name))) -%>
+        <td><%%= <%= singular_name %>.<%= attribute.name %>.to_s %></td>
+    <%- elsif attribute.type == :boolean -%>
+        <td><%%= Spree.t("scaffold.say_#{<%= singular_name %>.<%= attribute.name %>}") %></td>
+    <%- elsif attribute.type == :datetime -%>
+        <td><%%= l(<%= singular_name %>.<%= attribute.name %>.to_date) if <%= singular_name %>.<%= attribute.name %>.present? %></td>
+    <%- elsif attribute.type == :image -%>
+        <td><%%= wicked_pdf_image_tag(<%= singular_name %>.<%= attribute.name %>.url(:mini))if <%= singular_name %>.<%= attribute.name %>_file_name.present? %></td>
     <%- end -%>
-    </tr>
-  <%% end %>
+  <%- end -%>
+      </tr>
+    <%% end %>
     </tbody>
   </table>
 </div>

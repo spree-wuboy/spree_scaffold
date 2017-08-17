@@ -19,6 +19,8 @@ module Spree
       class_option :unique, type: :array, default: [], required: false, desc: 'validate uniqueness'
       class_option :nested, type: :array, default: [], required: false, desc: 'nested attributes(comments, ingredients), you must make sure log/scaffold.log already have the class'
       class_option :cache, type: :boolean, default: false, required: false, desc: 'make a simple cache mechanism'
+      class_option :model_class, type: :string, required: false, desc: 'different model class than Spree::Model'
+      class_option :add_by, type: :boolean, default: false, required: false, desc: 'add created_by and updated_at'
 
       def self.next_migration_number(path)
         if @prev_migration_nr
@@ -33,7 +35,11 @@ module Spree
       end
 
       def create_model
-        template 'model.rb', "app/models/spree/#{singular_name}.rb"
+        if options[:model_class]
+          template 'model.rb', "app/models/#{options[:model_class].gsub("::", "/").downcase}.rb"
+        else
+          template 'model.rb', "app/models/spree/#{singular_name}.rb"
+        end
       end
 
       def create_controller
@@ -47,7 +53,7 @@ module Spree
 
       def create_views
         create_nested
-        %w[index new edit _form show].each do |view|
+        %w[index new edit _form show _object _search].each do |view|
           template "views/#{view}.html.erb", "app/views/spree/admin/#{plural_name}/#{view}.html.erb"
         end
 
@@ -60,10 +66,6 @@ module Spree
         %w[index show].each do |view|
           template "views/#{view}.v1.rabl", "app/views/spree/api/v1/#{plural_name}/#{view}.v1.rabl"
         end
-      end
-
-      def create_migrations
-        migration_template 'migrations/model.rb', "db/migrate/create_spree_#{plural_name}.rb"
       end
 
       def create_assets
@@ -93,13 +95,18 @@ module Spree
       end
 
       def create_task
-        template "task.rake", "lib/tasks/spree/#{plural_name}.rake"
+        task_path = "lib/tasks/load_samples.rake"
+        template "load_samples.rake", task_path
+        inject_into_file task_path, %Q{
+        path = File.expand_path(File.join(Rails.root, 'db','samples','spree','#{plural_name}.rb'))
+        require path if !$LOADED_FEATURES.include?(path)
+        }, before: /puts \"Loaded samples\"/
       end
 
       def create_logs
-        log_path = "log/scaffold.log"
+        log_path = "config/scaffold.conf"
         create_file log_path unless File.exist?(File.join(destination_root, log_path))
-        gsub_file log_path, /rails g spree:scaffold #{name}.*\n/, ""
+        gsub_file log_path, /rails g spree:scaffold #{name} .*\n/, ""
         append_file log_path, "rails g spree:scaffold #{name} #{attributes.map {|a| "#{a.name}:#{a.type}"}.join(" ")} #{options.map {|o, v| v.present? ? "--#{o}=#{v.is_a?(Array) ? v.join(" ") : v.is_a?(Hash) ? v.map {|k1, v1| "#{k1}:#{v1}"}.join(" ") : v}" : ''}.join(" ")}\n".force_encoding("ASCII-8BIT")
       end
 
@@ -145,6 +152,10 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
         readme "USAGE"
       end
 
+      def create_migrations
+        migration_template 'migrations/model.rb', "db/migrate/create_spree_#{plural_name}.rb"
+      end
+
       protected
 
       def sortable?
@@ -159,8 +170,30 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
         self.attributes.find {|a| a.name == 'slug' && a.type == :string}
       end
 
+      def model_modules
+        classes = options[:model_class].split("::")
+        if classes.size > 1
+          classes[0..(classes.size-2)]
+        else
+          []
+        end
+      end
+
+      def module_class
+        classes = options[:model_class].split("::")
+        if classes.size > 1
+          classes[classes.size-1]
+        else
+          options[:model_class]
+        end
+      end
+
       def locale?
         options[:locale].any?
+      end
+
+      def add_by?
+        options[:add_by]
       end
 
       def i18n?
@@ -180,10 +213,27 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
         values.index(value)
       end
 
+      def presence_not_boolean
+        options[:presence].select{|p| self.attributes_hash[p].type != :boolean}
+      end
+
+      def presence_boolean
+        options[:presence].select{|p| self.attributes_hash[p].type == :boolean}
+      end
+
+      def attributes_hash
+        return @hash if @hash.present?
+        @hash = {}
+        self.attributes.each do |a|
+          @hash[a.name] = a
+        end
+        @hash
+      end
+
       private
 
       def create_nested
-        log_path = "log/scaffold.log"
+        log_path = "config/scaffold.conf"
         create_file log_path unless File.exist?(File.join(destination_root, log_path))
         @nested_hash = {}
         File.readlines(log_path).each do |line|

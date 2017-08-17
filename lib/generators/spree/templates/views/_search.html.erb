@@ -1,0 +1,95 @@
+<%% content_for :table_filter do -%>
+    <fieldset>
+      <legend><%%= Spree.t(:search) %></legend>
+      <%%= search_form_for [:admin, @search], :url => collection_url do |f| %>
+      <div data-hook="admin_<%=singular_name%>_index_search" class="well">
+        <div class="row no-marginb">
+          <%- search_first = true -%>
+    <%- options[:search].each do |column| -%>
+      <%- attribute = attributes.select{|a| a.name == column}.first -%>
+      <%- next unless attribute -%>
+      <%- if attribute.type == :datetime -%>
+          <div class="date-range-filter col-md-8  <%=column%>-column-range">
+            <div class="form-group">
+              <%%= label_tag :<%=attribute.name%>_range, "#{I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>")}#{Spree.t(:date_range)}" %>
+              <div class="row no-padding-bottom">
+                <div class="col-md-6">
+                  <div class="input-group">
+                    <%%= f.text_field :<%=attribute.name%>_gt, :class => 'datepicker datepicker-from form-control', :value => params[:q][:<%=attribute.name%>_gt], :placeholder => Spree.t(:start) %>
+                    <span class="input-group-addon"><i class="icon icon-calendar"></i></span>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="input-group">
+                    <%%= f.text_field :<%=attribute.name%>_lt, :class => 'datepicker datepicker-to form-control', :value => params[:q][:<%=attribute.name%>_lt], :placeholder => Spree.t(:stop) %>
+                    <span class="input-group-addon"><i class="icon icon-calendar"></i></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      <%- elsif attribute && attribute.type != :image && attribute.type != :file -%>
+          <div class="col-md-6 <%=column%>-column">
+            <div class="form-group">
+              <%%= f.label :<%=column%>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=column%>") %>
+              <%- if options[:fk].values.include?(column) -%>
+                  <%- fk_class_name = "Spree::#{options[:fk].invert[column].camelcase}" -%>
+                  <%% if defined?(<%=fk_class_name%>) %>
+                  <%%= f.select :<%= column %>_eq, options_for_select(@search_<%=column%>_options, params[:q][:<%= column %>_eq]), {include_blank: true}, {class: 'form-control'} %>
+                  <%% end %>
+              <%- elsif options[:enum].keys.include?(column) -%>
+                  <%%= f.select :<%= column %>_eq, options_for_select(Spree::<%=class_name%>.<%=column.pluralize%>.map{|k,v| [I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=column.pluralize%>.#{k}"), v]}), {include_blank: true}, {class: 'form-control'} %>
+              <%- elsif attribute.type == :boolean -%>
+                  <div>
+                    <%%=Spree.t("scaffold.none")%>: <%%= f.radio_button :<%=column%>_eq, -1, :checked => (params[:q][:<%=column%>_eq]=='-1') %>&nbsp;&nbsp;
+                    <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%=column%>_eq, 1, :checked => params[:q][:<%=column%>_eq] == '1' %>&nbsp;&nbsp;
+                    <%%=Spree.t("scaffold.say_no")%>: <%%= f.radio_button :<%=column%>_eq, 0, :checked => params[:q][:<%=column%>_eq] == '0' %>&nbsp;&nbsp;
+                  </div>
+              <%- else -%>
+                  <%%= f.<%= attribute.field_type %> :<%=column%>_cont, class: "form-control <%=search_first ? 'js-quick-search-target' : ''%>" %>
+                  <%- search_first = false -%>
+              <%- end -%>
+            </div>
+          </div>
+      <%- end -%>
+    <%- end -%>
+    <%- unless options[:skip_timestamps] -%>
+      <%- ["created_at", "updated_at"].each do |date_name| -%>
+          <div class="date-range-filter col-md-8  <%=date_name%>-column-range">
+            <div class="form-group">
+              <%%= label_tag :<%=date_name%>_range, "#{Spree.t(:<%=date_name%>)}#{Spree.t(:date_range)}" %>
+              <div class="row no-padding-bottom">
+                <div class="col-md-6">
+                  <div class="input-group">
+                    <%%= f.text_field :<%=date_name%>_gt, :class => 'datepicker datepicker-from form-control', :value => params[:q][:<%=date_name%>_gt], :placeholder => Spree.t(:start) %>
+                    <span class="input-group-addon"><i class="icon icon-calendar"></i></span>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="input-group">
+                    <%%= f.text_field :<%=date_name%>_lt, :class => 'datepicker datepicker-to form-control', :value => params[:q][:<%=date_name%>_lt], :placeholder => Spree.t(:stop) %>
+                    <span class="input-group-addon"><i class="icon icon-calendar"></i></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      <%- end -%>
+    <% end -%>
+          <div class="col-md-6 search-checked">
+            <div class="form-group">
+              <%%= label_tag 'q_checked_eq' do %>
+              <%%= f.check_box :checked, {:checked => (params[:q] && params[:q][:checked] == "true")}, 'true', '' %>
+              <%%= Spree.t('scaffold.search_checked_count', :count => checks.size) %>
+              <%% end %>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <%%= button Spree.t("scaffold.filter_results"), 'search' %>
+          <%%= button_link_to Spree.t("scaffold.reset"), collection_url, icon: 'remove' %>
+        </div>
+      </div>
+      <%% end %>
+    </fieldset>
+<%% end -%>

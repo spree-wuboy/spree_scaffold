@@ -15,3 +15,8 @@ header {
   clear: both;
   page-break-after: always;
 }
+
+table { page-break-inside:auto }
+thead { display: table-header-group }
+tfoot { display: table-row-group }
+tr    { page-break-inside:avoid; page-break-after:auto }

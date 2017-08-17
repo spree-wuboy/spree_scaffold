@@ -60,7 +60,11 @@ module Spree
         end
 
         def model_class
-          Spree::<%=class_name%>
+        <%- if options[:model_class] -%>
+          @model_class = <%=options[:model_class]%>
+        <%- else -%>
+          @model_class = Spree::<%=class_name%>
+        <%- end -%>
         end
       end
     end

@@ -10,6 +10,10 @@ class CreateSpree<%= class_name.pluralize %> < ActiveRecord::Migration
       t.<%= attribute.type %> :<%= attribute.name %> <%= options[:default].keys.include?(attribute.name) ? ", default: #{options[:enum].keys.include?(attribute.name) ? enum_index(attribute.name, options[:default][attribute.name]) : (attribute.type == :boolean || attribute.type == :integer) ? options[:default][attribute.name] : "'#{options[:default][attribute.name]}'"}" : ""%>
    <%- end -%>
 <% end -%>
+   <%- if add_by? -%>
+      t.integer :created_by_id
+      t.integer :updated_by_id
+   <%- end -%>
 <% unless options[:skip_timestamps] -%>
       t.timestamps
 <% end -%>
@@ -30,7 +34,6 @@ class CreateSpree<%= class_name.pluralize %> < ActiveRecord::Migration
 <%- end -%>
 <%- end -%>
 <%- if options[:i18n].any? -%>
-
     #translation tables
     Spree::<%= class_name %>.reset_column_information
     <%- if options[:force] -%>

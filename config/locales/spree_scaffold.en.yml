@@ -2,7 +2,13 @@ en:
   spree:
     updated_at: "updated at"
     scaffold:
+      new: new
+      edit: edit
+      list: ' list'
+      include_all_or_check: "include all row or only checked row (yes: include all, cancel: only checked)"
+      include_all_or_check_count: "include all row or only checked row (yes: include all %{all_count}, cancel: only checked %{check_count})"
       none: none
+      say_: ''
       say_yes: yes
       say_no: no
       say_true: yes
@@ -10,7 +16,8 @@ en:
       print: print
       batch: batch
       export: export
-      search_checked: "checked only:"
+      search_checked: "search only checked records"
+      search_checked_count: "search only checked %{count} records"
       menu: "new functions"
       add_sub_item: "add sub item"
       back_to_resources_list: "back to list"
@@ -22,29 +29,29 @@ en:
       report_search_criteria: "search criteria"
       actions: actions
       conditions:
-        eq: "equal to"
-        not_eq: "not equal to"
-        lt: "lower than"
-        gt: "greater than"
-        lteq: "lower than and equal to"
-        gteq: "greater than and equal to"
-        in: "in"
-        not_in: "not_in"
-        cont: "contain"
-        not_cont: "not contain"
-        cont_any: "contain any of"
-        not_cont_any: "not contain any of"
-        cont_all: "contain all of"
-        not_cont_all: "not contain all of"
-        start: "start with"
-        not_start: "not start with"
-        end: "end with"
-        not_end: "not end with"
-        true: "true"
-        not_true: "false or nil"
-        false: "false"
-        not_false: "true or nil"
-        present: "present"
-        blank: "blank"
-        null: "null"
-        not_null: "not null"
+        condition_eq: "equal to"
+        condition_not_eq: "not equal to"
+        condition_lt: "lower than"
+        condition_gt: "greater than"
+        condition_lteq: "lower than and equal to"
+        condition_gteq: "greater than and equal to"
+        condition_in: "in"
+        condition_not_in: "not_in"
+        condition_cont: "contain"
+        condition_not_cont: "not contain"
+        condition_cont_any: "contain any of"
+        condition_not_cont_any: "not contain any of"
+        condition_cont_all: "contain all of"
+        condition_not_cont_all: "not contain all of"
+        condition_start: "start with"
+        condition_not_start: "not start with"
+        condition_end: "end with"
+        condition_not_end: "not end with"
+        condition_true: "true"
+        condition_not_true: "false or nil"
+        condition_false: "false"
+        condition_not_false: "true or nil"
+        condition_present: "present"
+        condition_blank: "blank"
+        condition_null: "null"
+        condition_not_null: "not null"

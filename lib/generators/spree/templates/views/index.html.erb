@@ -1,114 +1,21 @@
 <%% content_for :title do %>
-  <%%= "Spree #{Spree.t('administration')}: " %>
-  <%%= I18n.t("activerecord.models.spree/<%=singular_name%>") %>
+  <%%= "Spree #{Spree.t('administration')}: #{I18n.t("activerecord.models.spree/<%=singular_name%>")}" %>
 <%% end %>
 
 <%% content_for :page_title do %>
-  <%%= Spree.t(:listing_<%= plural_name %>) %>
+  <%%= "#{I18n.t("activerecord.models.spree/<%=singular_name%>")}#{Spree.t('scaffold.list')}" %>
 <%% end %>
 
 <%% content_for :page_actions do %>
-  <%%= button_link_to Spree.t("scaffold.print"), collection_url(:format => "pdf", :params => params.to_unsafe_h), :icon => 'icon-plus', :id => 'admin_print_post', :target => "_blank" %>
-  <%%= button_link_to Spree.t("scaffold.batch"), batch_url(:format => "pdf", :params => params.to_unsafe_h), :icon => 'icon-plus', :id => 'admin_print_post', :target => "_blank" %>
-  <%%= button_link_to Spree.t("scaffold.export"), collection_url(:format => "csv", :params => params.to_unsafe_h), :icon => 'icon-print', :id => 'admin_export_post', :target => "_blank" %>
-  <%%= button_link_to Spree.t(:new_<%= singular_name %>), new_object_url, class: 'btn-success', icon: 'add', id: 'admin_new_<%= singular_name %>_link' if can?(:create, Spree::<%= class_name %>) %>
+  <%%= button_link_to Spree.t("scaffold.print"), collection_url(:format => "pdf", :params => params.to_unsafe_h), :icon => 'print', :id => 'admin-print', :target => "_blank", :method => :get, :data => {:prompt => {:message => Spree.t('scaffold.include_all_or_check_count', :all_count => @collection.size, :check_count => checks.size), :param => 'include_all', :confirm => true}} %>
+  <%%= button_link_to Spree.t("scaffold.batch"), batch_url(:format => "pdf", :params => params.to_unsafe_h), :icon => 'book', :id => 'admin-batch', :target => "_blank", :method => :get, :data => {:prompt => {:message => Spree.t('scaffold.include_all_or_check_count', :all_count => @collection.size, :check_count => checks.size), :param => 'include_all', :confirm => true}}  %>
+  <%%= button_link_to Spree.t("scaffold.export"), collection_url(:format => "csv", :params => params.to_unsafe_h), :icon => 'export', :id => 'admin-export', :target => "_blank", :method => :get, :data => {:prompt => {:message => Spree.t('scaffold.include_all_or_check_count', :all_count => @collection.size, :check_count => checks.size), :param => 'include_all', :confirm => true}}  %>
+  <%%= button_link_to "#{Spree.t('scaffold.new')}#{I18n.t("activerecord.models.spree/<%=singular_name%>")}", new_object_url, class: 'btn-success', icon: 'add', id: 'admin-new' if can?(:create, model_class) %>
 <%% end %>
 
-<%% content_for :table_filter do -%>
-  <div data-hook="admin_orders_index_search" class="well">
-    <fieldset>
-      <legend><%%= Spree.t(:search) %></legend>
-        <%%= search_form_for [:admin, @search], :url => collection_url do |f| %>
-          <div class="row no-marginb">
-<%- search_first = true -%>
-<%- options[:search].each do |column| -%>
-<%- attribute = attributes.select{|a| a.name == column}.first -%>
-<%- next unless attribute -%>
-  <%- if attribute.type == :datetime -%>
-            <div class="date-range-filter col-md-8">
-              <div class="form-group">
-                <%%= label_tag :<%=attribute.name%>_range, "#{I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>")}#{Spree.t(:date_range)}" %>
-                <div class="row no-padding-bottom">
-                  <div class="col-md-6">
-                    <div class="input-group">
-                      <%%= f.text_field :<%=attribute.name%>_gt, :class => 'datepicker datepicker-from form-control', :value => params[:q][:<%=attribute.name%>_gt], :placeholder => Spree.t(:start) %>
-                      <span class="input-group-addon"><i class="icon icon-calendar"></i></span>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="input-group">
-                      <%%= f.text_field :<%=attribute.name%>_lt, :class => 'datepicker datepicker-to form-control', :value => params[:q][:<%=attribute.name%>_lt], :placeholder => Spree.t(:stop) %>
-                      <span class="input-group-addon"><i class="icon icon-calendar"></i></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-  <%- elsif attribute && attribute.type != :image && attribute.type != :file -%>
-            <div class="col-md-6">
-              <div class="form-group">
-                <%%= f.label :<%=column%> %>
-            <%- if options[:fk].values.include?(column) -%>
-                <%- fk_class_name = "Spree::#{options[:fk].invert[column].camelcase}" -%>
-                <%% if defined?(<%=fk_class_name%>) %>
-                  <%%= f.select :<%= column %>_eq, options_for_select(@search_<%=column%>.map { |s| [s.email, s.id] }, f.object.<%=column%>), {include_blank: true}, {class: 'form-control'} %>
-                <%% end %>
-            <%- elsif options[:enum].keys.include?(column) -%>
-                <%%= f.select :<%= column %>_eq, options_for_select(Spree::<%=class_name%>.<%=column.pluralize%>.map{|k,v| [I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=column.pluralize%>.#{k}"), v]}), {include_blank: true}, {class: 'form-control'} %>
-            <%- elsif attribute.type == :boolean -%>
-                <div>
-                  <%%=Spree.t("scaffold.none")%>: <%%= f.radio_button :<%=column%>_eq, -1, :checked => (params[:q][:<%=column%>_eq]=='-1') %>&nbsp;&nbsp;
-                  <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%=column%>_eq, 1, :checked => params[:q][:<%=column%>_eq] == '1' %>&nbsp;&nbsp;
-                  <%%=Spree.t("scaffold.say_no")%>: <%%= f.radio_button :<%=column%>_eq, 0, :checked => params[:q][:<%=column%>_eq] == '0' %>&nbsp;&nbsp;
-                </div>
-            <%- else -%>
-                <%%= f.<%= attribute.field_type %> :<%=column%>_cont, class: "form-control <%=search_first ? 'js-quick-search-target' : ''%>" %>
-                <%- search_first = false -%>
-            <%- end -%>
-              </div>
-            </div>
-  <%- end -%>
-<%- end -%>
-<%- unless options[:skip_timestamps] -%>
-  <%- ["created_at", "updated_at"].each do |date_name| -%>
-            <div class="date-range-filter col-md-8">
-              <div class="form-group">
-                <%%= label_tag :<%=date_name%>_range, "#{Spree.t(:<%=date_name%>)}#{Spree.t(:date_range)}" %>
-                <div class="row no-padding-bottom">
-                  <div class="col-md-6">
-                    <div class="input-group">
-                      <%%= f.text_field :<%=date_name%>_gt, :class => 'datepicker datepicker-from form-control', :value => params[:q][:<%=date_name%>_gt], :placeholder => Spree.t(:start) %>
-                      <span class="input-group-addon"><i class="icon icon-calendar"></i></span>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="input-group">
-                      <%%= f.text_field :<%=date_name%>_lt, :class => 'datepicker datepicker-to form-control', :value => params[:q][:<%=date_name%>_lt], :placeholder => Spree.t(:stop) %>
-                      <span class="input-group-addon"><i class="icon icon-calendar"></i></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-  <%- end -%>
-<% end -%>
-            <div class="col-md-6">
-              <div class="form-group">
-                <%%= label_tag 'q_checked_eq' do %>
-                  <%%= f.check_box :checked, {:checked => (params[:q] && params[:q][:checked] == "true")}, 'true', '' %>
-                  <%%= Spree.t(:search_checked) %>
-                <%% end %>
-              </div>
-            </div>
-          </div>
-          <div class="form-actions">
-            <%%= button Spree.t("scaffold.filter_results"), 'search' %>
-            <%%= button_link_to Spree.t("scaffold.reset"), collection_url, icon: 'remove' %>
-          </div>
-        <%% end %>
-    </fieldset>
-  </div>
-<%% end -%>
+<%%= render 'search' %>
+
+<%%= render 'spree/admin/shared/index_table_options', collection: @collection %>
 
 <%- if sortable? -%>
 <table class="table sortable" id="listing_<%= plural_name %>" data-hook data-sortable-link="<%%= <%= "update_positions_admin_#{plural_name}_url" %> %>">
@@ -125,7 +32,7 @@
       <th><%%=sort_link(@search, :<%= attribute.name %>, t(:<%= attribute.name %>, scope: 'activerecord.attributes.spree/<%= singular_name %>') , default_order: :desc)%></th>
   <%- end -%>
 <%- end -%>
-      <th data-hook="admin_<%= plural_name %>_index_header_actions" class="actions text-center"><%=Spree.t("scaffold.actions")%></th>
+      <th data-hook="admin_<%= plural_name %>_index_header_actions" class="actions text-center"><%%=Spree.t("scaffold.actions")%></th>
       <th data-hook="admin_<%= plural_name %>_index_header_checks" class="checks text-center">
         <%%= link_to Spree.t('scaffold.check_page'), batch_check_url(:params => params.to_unsafe_h.merge(:all => "true")) , :class => "btn btn-xs btn-primary batch-checked"%>
         <%%= link_to Spree.t('scaffold.check_reverse'), batch_check_url(:params => params.to_unsafe_h.merge(:all => "reverse")), :class => "btn btn-xs btn-default batch-checked"%>
@@ -134,7 +41,7 @@
     </tr>
   </thead>
   <tbody>
-    <%% @<%= plural_name %>.each do |<%= singular_name %>| %>
+    <%% @collection.each do |<%= singular_name %>| %>
       <tr id="<%%= spree_dom_id <%= singular_name %> %>" data-hook="admin_<%= plural_name %>_index_rows" class="<%%= cycle('odd', 'even')%>">
       <%- if sortable? -%>
         <td class="move-handle"><span class="icon icon-move handle"></span></td>
@@ -168,4 +75,5 @@
   </tbody>
 </table>
 
-<%%= paginate @<%= plural_name %> %>
+<%%= render 'spree/admin/shared/index_table_options', collection: @collection, simple: true %>
+
