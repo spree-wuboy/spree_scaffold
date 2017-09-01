@@ -35,7 +35,7 @@ module Spree
         end
       end
 
-      def seacher
+      def seacher(override_includes=nil)
         params[:q] ||= {}
         if !params[:q][:created_at_gt].blank?
           params[:q][:created_at_gt] = Time.zone.parse(params[:q][:created_at_gt]).beginning_of_day rescue ""
@@ -45,11 +45,10 @@ module Spree
           params[:q][:created_at_lt] = Time.zone.parse(params[:q][:created_at_lt]).end_of_day rescue ""
         end
         base_search = method(:collection).super_method.call
-        base_search.includes(includes)
         if params[:q][:checked] == "true" || (params[:include_all] && params[:include_all] == 'false')
-          base_search.ransack(params[:q].merge(:id_in => session[session_key]))
+          base_search.includes(override_includes || includes).ransack(params[:q].merge(:id_in => session[session_key]))
         else
-          base_search.ransack(params[:q])
+          base_search.includes(override_includes || includes).ransack(params[:q])
         end
       end
 
@@ -107,7 +106,7 @@ module Spree
         else
           session[session_key].delete(@object.id) if session[session_key].include?(@object.id)
         end
-        render :nothing => true
+        head :ok
       end
 
       def session_key

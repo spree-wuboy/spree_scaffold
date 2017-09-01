@@ -2,6 +2,13 @@
 
 $(document).ready(function() {
 
+    $(".include-all-check").change(function(e) {
+        $(".include-all-check").val($(this).val());
+        $(".include-all").val($(this).val());
+        e.preventDefault();
+        e.stopPropagation();
+    })
+
     $(".nested-template").hide().find("input, select, textarea").prop( "disabled", true )
     var subFieldId = 0;
     $('.spree_add_sub_fields').click(function () {

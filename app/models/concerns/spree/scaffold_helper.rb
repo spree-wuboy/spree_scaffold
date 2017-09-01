@@ -7,11 +7,11 @@ module Spree
       before_save :add_update_user
 
       def add_create_user
-        self.created_by_id = user_id if user_id
+        self.created_by_id = user_id if user_id && respond_to?(:created_by_id)
       end
 
       def add_update_user
-        self.updated_by_id = user_id if user_id
+        self.updated_by_id = user_id if user_id && respond_to?(:updated_by_id)
       end
 
       # csv
