@@ -2,9 +2,6 @@
   <table class="table">
     <thead>
     <tr data-hook="admin_<%= plural_name %>_index_headers">
-  <%- if sortable? -%>
-      <th class="no-border"></th>
-  <%- end -%>
   <%- attributes.each do |attribute| -%>
     <%- if (attribute.type == :string && attribute.name != "slug") || attribute.type == :boolean || (attribute.type == :integer && attribute.name != "position" && !(options[:fk].values.include?(attribute.name))) || attribute.type == :datetime || attribute.type == :image  -%>
       <th><%%=t(:<%= attribute.name %>, scope: 'activerecord.attributes.spree/<%= singular_name %>')%></th>

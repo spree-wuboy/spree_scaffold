@@ -45,11 +45,15 @@ module Spree
           params[:q][:created_at_lt] = Time.zone.parse(params[:q][:created_at_lt]).end_of_day rescue ""
         end
         base_search = method(:collection).super_method.call
-        if params[:q][:checked] == "true" || (params[:include_all] && params[:include_all] == 'false')
-          base_search.includes(override_includes || includes).ransack(params[:q].merge(:id_in => session[session_key]))
+        if params[:q][:checked] == "true"
+          result = base_search.includes(override_includes || includes).ransack(params[:q].merge(:id_in => session[session_key]))
+        elsif params[:checks]
+          result = base_search.includes(override_includes || includes).ransack(params[:q].merge(:id_in => params[:checks].split(",")))
+          params[:checks] = nil
         else
-          base_search.includes(override_includes || includes).ransack(params[:q])
+          result = base_search.includes(override_includes || includes).ransack(params[:q])
         end
+        result
       end
 
       def collection
@@ -85,9 +89,15 @@ module Spree
       end
 
       def batch_checked
+        session[session_key] ||= []
         if params[:all].present?
           if params[:all] == "true"
-            session[session_key] = collection.pluck(:id)
+            page_keys = collection.pluck(:id)
+            if (page_keys - session[session_key]).empty?
+              session[session_key] = (session[session_key] - collection.pluck(:id)).uniq
+            else
+              session[session_key] = (session[session_key] + collection.pluck(:id)).uniq
+            end
           elsif params[:all] == "reverse"
             collection.pluck(:id).each do |id|
               session[session_key].include?(id) ? session[session_key].delete(id) : session[session_key].push(id)

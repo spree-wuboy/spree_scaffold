@@ -37,5 +37,8 @@ $.rails.handlePrompt = (element) ->
 allowAction = $.rails.allowAction
 $.rails.allowAction = (element) ->
   if element.data 'prompt'
-    $.rails.handlePrompt element
-  allowAction element
+    result = $.rails.handlePrompt element
+  if result != null
+    allowAction element
+  else
+    false

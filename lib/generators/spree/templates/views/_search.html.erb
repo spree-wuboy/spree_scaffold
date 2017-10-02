@@ -80,7 +80,7 @@
             <div class="form-group">
               <%%= label_tag 'q_checked_eq' do %>
               <%%= f.check_box :checked, {:checked => (params[:q] && params[:q][:checked] == "true")}, 'true', '' %>
-              <%%= Spree.t('scaffold.search_checked_count', :count => checks.size) %>
+              <%%= Spree.t('scaffold.search_checked') %>
               <%% end %>
             </div>
           </div>
