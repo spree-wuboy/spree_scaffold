@@ -35,7 +35,7 @@ Usage
 
 Generate a scaffold for the new `Task` model:
 
-    $  rails g spree:scaffold class_name name:string slug:string user_id:integer
+    $  rails g spree_scaffold:scaffold class_name name:string slug:string user_id:integer
                                       description:text image:image order_id:integer
                                       important:boolean task_date:datetime
                                       [--search=name user_id important]

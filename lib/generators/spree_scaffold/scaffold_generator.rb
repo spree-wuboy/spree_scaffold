@@ -1,11 +1,11 @@
 require 'rails/generators/named_base'
 
-module Spree
+module SpreeScaffold
   module Generators
     class ScaffoldGenerator < Rails::Generators::NamedBase
       include Rails::Generators::Migration
 
-      source_root File.expand_path('../../templates', __FILE__)
+      source_root File.expand_path('../templates', __FILE__)
 
       argument :attributes, type: :array, default: [], banner: 'field:type field:type'
       class_option :locale, type: :hash, default: {}, required: false, desc: 'additional locale (locale:name locale:name)'
@@ -214,11 +214,11 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
       end
 
       def presence_not_boolean
-        options[:presence].select{|p| self.attributes_hash[p].type != :boolean}
+        options[:presence].select {|p| self.attributes_hash[p].type != :boolean}
       end
 
       def presence_boolean
-        options[:presence].select{|p| self.attributes_hash[p].type == :boolean}
+        options[:presence].select {|p| self.attributes_hash[p].type == :boolean}
       end
 
       def attributes_hash

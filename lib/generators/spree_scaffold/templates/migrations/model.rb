@@ -1,4 +1,4 @@
-class CreateSpree<%= class_name.pluralize %> < ActiveRecord::Migration
+class CreateSpree<%= class_name.pluralize %> < ActiveRecord::Migration[5.0]
   def up
     create_table :spree_<%= table_name %><%=options[:force] ? ", :force => true" : ""%> do |t|
 <% attributes.each do |attribute| -%>
