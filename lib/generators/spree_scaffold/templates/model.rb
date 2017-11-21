@@ -57,7 +57,7 @@ module Spree
 
 <%- options[:fk].each do |ref, fk_id| -%>
     belongs_to :<%=ref%>, foreign_key: '<%=fk_id%>'
-    # please add has_many <%=plural_name%> to <%=ref%> table
+    # please add 'has_many :<%=plural_name%>' to <%=ref%> table
 <%- end -%>
     self.whitelisted_ransackable_associations = %w[<%=options[:fk].keys.join(" ")%>]
     self.whitelisted_ransackable_attributes = %w[<%=options[:search].join(" ")%> <%=options[:skip_timestamps] ? "" : "created_at updated_at"%>]

@@ -21,6 +21,7 @@ module SpreeScaffold
       class_option :cache, type: :boolean, default: false, required: false, desc: 'make a simple cache mechanism'
       class_option :model_class, type: :string, required: false, desc: 'different model class than Spree::Model'
       class_option :add_by, type: :boolean, default: false, required: false, desc: 'add created_by and updated_at'
+      class_option :gen, type: :string, required: false, desc: 'generate type, default is false, you can use v(view), m(migration+model), c(controller), o(override). e.g. vm will generate view, model, and migration'
 
       def self.next_migration_number(path)
         if @prev_migration_nr
@@ -35,97 +36,106 @@ module SpreeScaffold
       end
 
       def create_model
-        if options[:model_class]
-          template 'model.rb', "app/models/#{options[:model_class].gsub("::", "/").downcase}.rb"
-        else
-          template 'model.rb', "app/models/spree/#{singular_name}.rb"
+        if !options[:gen] || options[:gen].include?("m")
+          if options[:model_class]
+            template 'model.rb', "app/models/#{options[:model_class].gsub("::", "/").downcase}.rb"
+          else
+            template 'model.rb', "app/models/spree/#{singular_name}.rb"
+          end
         end
       end
 
       def create_controller
-        create_nested
-        template 'controller.rb', "app/controllers/spree/admin/#{plural_name}_controller.rb"
+        if !options[:gen] || options[:gen].include?("c")
+          create_nested
+          template 'controller.rb', "app/controllers/spree/admin/#{plural_name}_controller.rb"
+        end
       end
 
       def create_api_controller
-        template 'api_controller.rb', "app/controllers/spree/api/v1/#{plural_name}_controller.rb"
+        if !options[:gen] || options[:gen].include?("c")
+          template 'api_controller.rb', "app/controllers/spree/api/v1/#{plural_name}_controller.rb"
+        end
       end
 
       def create_views
-        create_nested
-        %w[index new edit _form show _object _search].each do |view|
-          template "views/#{view}.html.erb", "app/views/spree/admin/#{plural_name}/#{view}.html.erb"
-        end
+        if !options[:gen] || options[:gen].include?("v")
+          create_nested
+          %w[index new edit _form show _object _search].each do |view|
+            template "views/#{view}.html.erb", "app/views/spree/admin/#{plural_name}/#{view}.html.erb"
+          end
 
-        %w[index batch show _object].each do |pdf|
-          template "views/#{pdf}.pdf.erb", "app/views/spree/admin/#{plural_name}/#{pdf}.pdf.erb"
+          %w[index batch show _object].each do |pdf|
+            template "views/#{pdf}.pdf.erb", "app/views/spree/admin/#{plural_name}/#{pdf}.pdf.erb"
+          end
         end
       end
 
       def create_api_views
-        %w[index show].each do |view|
-          template "views/#{view}.v1.rabl", "app/views/spree/api/v1/#{plural_name}/#{view}.v1.rabl"
+        if !options[:gen] || options[:gen].include?("v")
+          %w[index show].each do |view|
+            template "views/#{view}.v1.rabl", "app/views/spree/api/v1/#{plural_name}/#{view}.v1.rabl"
+          end
         end
       end
 
       def create_assets
-        %w{javascripts stylesheets}.each do |path|
-          empty_directory "app/assets/#{path}/spree/frontend"
-          empty_directory "app/assets/#{path}/spree/backend"
-        end
-        assets = ["assets/javascripts/spree/frontend/all.js",
-                  "assets/stylesheets/spree/frontend/all.css",
-                  "assets/javascripts/spree/backend/all.js",
-                  "assets/stylesheets/spree/backend/all.css"]
-        assets.each do |path|
-          template path, "app/#{path}" unless File.exist?("app/#{path}")
-        end
-        if i18n?
-          inject_into_file "app/assets/javascripts/spree/backend/all.js", "//= require spree/backend/spree_globalize\n", before: /\/\/= require_tree/
-          inject_into_file 'app/assets/stylesheets/spree/backend/all.css', " *= require spree/backend/spree_globalize\n", before: / \*= require_tree/
-        end
+        if !options[:gen]
+          %w{javascripts stylesheets}.each do |path|
+            empty_directory "app/assets/#{path}/spree/frontend"
+            empty_directory "app/assets/#{path}/spree/backend"
+          end
+          assets = ["assets/javascripts/spree/frontend/all.js",
+                    "assets/stylesheets/spree/frontend/all.css",
+                    "assets/javascripts/spree/backend/all.js",
+                    "assets/stylesheets/spree/backend/all.css"]
+          assets.each do |path|
+            template path, "app/#{path}" unless File.exist?("app/#{path}")
+          end
+          if i18n?
+            inject_into_file "app/assets/javascripts/spree/backend/all.js", "//= require spree/backend/spree_globalize\n", before: /\/\/= require_tree/
+            inject_into_file 'app/assets/stylesheets/spree/backend/all.css', " *= require spree/backend/spree_globalize\n", before: / \*= require_tree/
+          end
 
-        if nested?
-          inject_into_file "app/assets/javascripts/spree/backend/all.js", "//= require spree/backend/spree_scaffold\n", before: /\/\/= require_tree/
+          if nested?
+            inject_into_file "app/assets/javascripts/spree/backend/all.js", "//= require spree/backend/spree_scaffold\n", before: /\/\/= require_tree/
+          end
         end
       end
 
       def create_samples
-        template "samples.rb", "db/samples/spree/#{plural_name}.rb"
-      end
-
-      def create_task
-        task_path = "lib/tasks/load_samples.rake"
-        template "load_samples.rake", task_path
-        inject_into_file task_path, %Q{
-        path = File.expand_path(File.join(Rails.root, 'db','samples','spree','#{plural_name}.rb'))
-        require path if !$LOADED_FEATURES.include?(path)
-        }, before: /puts \"Loaded samples\"/
+        if !options[:gen]
+          template "samples.rb", "db/samples/spree/#{plural_name}.rb"
+        end
       end
 
       def create_logs
         log_path = "config/scaffold.conf"
         create_file log_path unless File.exist?(File.join(destination_root, log_path))
-        gsub_file log_path, /rails g spree:scaffold #{name} .*\n/, ""
-        append_file log_path, "rails g spree:scaffold #{name} #{attributes.map {|a| "#{a.name}:#{a.type}"}.join(" ")} #{options.map {|o, v| v.present? ? "--#{o}=#{v.is_a?(Array) ? v.join(" ") : v.is_a?(Hash) ? v.map {|k1, v1| "#{k1}:#{v1}"}.join(" ") : v}" : ''}.join(" ")}\n".force_encoding("ASCII-8BIT")
+        gsub_file log_path, /rails g spree_scaffold:scaffold #{name} .*\n/, ""
+        append_file log_path, "rails g spree_scaffold:scaffold #{name} #{attributes.map {|a| "#{a.name}:#{a.type}"}.join(" ")} #{options.map {|o, v| v.present? ? "--#{o}=#{v.is_a?(Array) ? v.join(" ") : v.is_a?(Hash) ? v.map {|k1, v1| "#{k1}:#{v1}"}.join(" ") : v}" : ''}.join(" ")}\n".force_encoding("ASCII-8BIT")
       end
 
       def create_locale
-        current_locales = ["en", "zh-TW"]
-        locales = (options[:locale].keys + current_locales).uniq
-        locales.each do |locale|
-          @name = options[:locale][locale] ? options[:locale][locale].force_encoding("ASCII-8BIT") : singular_name
-          if current_locales.include?(locale) && locale != "en"
-            template "locales/#{locale}.yml", "config/locales/#{plural_name}.#{locale}.yml"
-          else
-            @locale = locale
-            template "locales/locale.yml", "config/locales/#{plural_name}.#{locale}.yml"
+        if !options[:gen]
+          current_locales = ["en", "zh-TW"]
+          locales = (options[:locale].keys + current_locales).uniq
+          locales.each do |locale|
+            @name = options[:locale][locale] ? options[:locale][locale].force_encoding("ASCII-8BIT") : singular_name
+            if current_locales.include?(locale) && locale != "en"
+              template "locales/#{locale}.yml", "config/locales/#{plural_name}.#{locale}.yml"
+            else
+              @locale = locale
+              template "locales/locale.yml", "config/locales/#{plural_name}.#{locale}.yml"
+            end
           end
         end
       end
 
       def create_deface_override
-        template 'overrides/add_sub_menu.html.erb.deface', "app/overrides/spree/admin/shared/sub_menu/_scaffold/add_#{singular_name}_menu.html.erb.deface"
+        if !options[:gen] || options[:gen].include?("o")
+          template 'overrides/add_sub_menu.html.erb.deface', "app/overrides/spree/admin/shared/sub_menu/_scaffold/add_#{singular_name}_menu.html.erb.deface"
+        end
       end
 
       def create_translation_template
@@ -134,7 +144,9 @@ module SpreeScaffold
       end
 
       def create_routes
-        append_file 'config/routes.rb', routes_text
+        if !options[:gen]
+          append_file 'config/routes.rb', routes_text
+        end
       end
 
       def create_gems
@@ -153,7 +165,9 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
       end
 
       def create_migrations
-        migration_template 'migrations/model.rb', "db/migrate/create_spree_#{plural_name}.rb"
+        if !options[:gen] || options[:gen].include?("m")
+          migration_template 'migrations/model.rb', "db/migrate/create_spree_#{plural_name}.rb"
+        end
       end
 
       protected

@@ -3,7 +3,7 @@
     <thead>
     <tr data-hook="admin_<%= plural_name %>_index_headers">
   <%- attributes.each do |attribute| -%>
-    <%- if (attribute.type == :string && attribute.name != "slug") || attribute.type == :boolean || (attribute.type == :integer && attribute.name != "position" && !(options[:fk].values.include?(attribute.name))) || attribute.type == :datetime || attribute.type == :image  -%>
+    <%- if (attribute.type == :string && attribute.name != "slug") || attribute.type == :boolean || (attribute.type == :integer && attribute.name != "position" && !(options[:fk].values.include?(attribute.name))) || attribute.type == :datetime || attribute.type == :image || attribute.type == :float  -%>
       <th><%%=t(:<%= attribute.name %>, scope: 'activerecord.attributes.spree/<%= singular_name %>')%></th>
     <%- end -%>
   <%- end -%>
@@ -23,6 +23,8 @@
         <td><%%= l(<%= singular_name %>.<%= attribute.name %>.to_date) if <%= singular_name %>.<%= attribute.name %>.present? %></td>
     <%- elsif attribute.type == :image -%>
         <td><%%= wicked_pdf_image_tag(<%= singular_name %>.<%= attribute.name %>.url(:mini))if <%= singular_name %>.<%= attribute.name %>_file_name.present? %></td>
+    <%- elsif attribute.type == :integer || attribute.type == :float  -%>
+        <td><%%=<%= singular_name %>.<%= attribute.name %>%></td>
     <%- end -%>
   <%- end -%>
       </tr>

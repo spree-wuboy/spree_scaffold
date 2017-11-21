@@ -57,18 +57,16 @@
       <%- ["created_at", "updated_at"].each do |date_name| -%>
           <div class="date-range-filter col-md-8  <%=date_name%>-column-range">
             <div class="form-group">
-              <%%= label_tag :<%=date_name%>_range, "#{Spree.t(:<%=date_name%>)}#{Spree.t(:date_range)}" %>
+              <%%= label_tag :<%=date_name%>_range, "#{Spree.t(:<%=date_name%>)} #{Spree.t(:date_range)}" %>
               <div class="row no-padding-bottom">
                 <div class="col-md-6">
                   <div class="input-group">
                     <%%= f.text_field :<%=date_name%>_gt, :class => 'datepicker datepicker-from form-control', :value => params[:q][:<%=date_name%>_gt], :placeholder => Spree.t(:start) %>
-                    <span class="input-group-addon"><i class="icon icon-calendar"></i></span>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="input-group">
                     <%%= f.text_field :<%=date_name%>_lt, :class => 'datepicker datepicker-to form-control', :value => params[:q][:<%=date_name%>_lt], :placeholder => Spree.t(:stop) %>
-                    <span class="input-group-addon"><i class="icon icon-calendar"></i></span>
                   </div>
                 </div>
               </div>
