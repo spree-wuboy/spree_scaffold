@@ -185,7 +185,7 @@ module Spree
       end
 
       def add_user_id
-        @object.user_id = spree_current_user.id if spree_current_user
+        @object.user_id = spree_current_user.id if spree_current_user && @object.respond_to?(:user_id=)
       end
     end
   end

@@ -224,6 +224,7 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
 
       def enum_index(enum, value)
         values = options[:enum][enum].split(",")
+        puts("values=#{values.inspect}, value=#{value}, values.index(value)=#{values.index(value)}")
         values.index(value)
       end
 
