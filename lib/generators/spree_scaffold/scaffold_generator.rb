@@ -118,10 +118,11 @@ module SpreeScaffold
 
       def create_locale
         if !options[:gen]
-          current_locales = ["en", "zh-TW"]
+          current_locales = ["en"]
           locales = (options[:locale].keys + current_locales).uniq
           locales.each do |locale|
-            @name = options[:locale][locale] ? options[:locale][locale].force_encoding("ASCII-8BIT") : singular_name
+            @plural_title = options[:locale][locale] ? options[:locale][locale].force_encoding("ASCII-8BIT") : class_name.pluralize.titleize
+            @singular_title = options[:locale][locale] ? options[:locale][locale].force_encoding("ASCII-8BIT") : class_name.titleize
             if current_locales.include?(locale) && locale != "en"
               template "locales/#{locale}.yml", "config/locales/#{plural_name}.#{locale}.yml"
             else
@@ -224,7 +225,6 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
 
       def enum_index(enum, value)
         values = options[:enum][enum].split(",")
-        puts("values=#{values.inspect}, value=#{value}, values.index(value)=#{values.index(value)}")
         values.index(value)
       end
 
@@ -253,8 +253,14 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
         @nested_hash = {}
         File.readlines(log_path).each do |line|
           options[:nested].each do |nested|
-            if line.include?("rails g spree:scaffold #{nested.singularize}")
-              @nested_hash[nested] = line.gsub(("rails g spree:scaffold #{nested.singularize}"), "").gsub(/--.*/, "").split(" ").map {|s| {:name => s.split(":")[0], :type => s.split(":")[1].to_sym}}
+            if line.include?("rails g spree:scaffold #{nested.singularize} ") || line.include?("rails g spree_scaffold:scaffold #{nested.singularize} ")
+              line = line.gsub(/ [ ]*/, " ").gsub("\n", "")
+              nested_options_map = line.sub(/.*? --/, "").split("--")
+              nested_options = {}
+              nested_options_map && nested_options_map.each do |op|
+                nested_options[op.split("=")[0].to_sym] = op.split("=")[1].sub(/ $/, "")
+              end
+              @nested_hash[nested] = line.gsub("spree:scaffold", "spree_scaffold:scaffold").gsub("rails g spree_scaffold:scaffold #{nested.singularize}", "").gsub(/--.*/, "").split(" ").map {|s| {:name => s.split(":")[0], :type => s.split(":")[1].to_sym, :enum => nested_options[:enum] && nested_options[:enum].split(" ") && nested_options[:enum].split(" ").map{|o| o.split(":")[0]}.include?(s.split(":")[0])}}
             end
           end
         end

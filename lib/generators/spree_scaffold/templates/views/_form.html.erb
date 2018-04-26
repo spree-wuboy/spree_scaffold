@@ -125,8 +125,8 @@
       <%- end -%>
   <%- @nested_hash[nested].each do |hash| -%>
     <%- if hash[:name] == "#{singular_name}_id" || hash[:name] == 'position' -%>
-    <%- elsif options[:enum].keys.include?(hash[:name]) -%>
-        <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.select :<%= hash[:name] %>, options_for_select(Spree::<%=nested.singularize.camelcase%>.<%=hash[:name].pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=nested.singularize%>.<%=hash[:name].pluralize%>.#{k}"), k]}, f.object.<%=hash[:name]%>), {<%=options[:presence].include?(hash[:name]) ? "" : "include_blank: true"%>}, {class: 'form-control'} %></td>
+    <%- elsif hash[:enum] -%>
+        <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.select :<%= hash[:name] %>, options_for_select(Spree::<%=nested.singularize.camelcase%>.<%=hash[:name].pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=nested.singularize%>.<%=hash[:name].pluralize%>.#{k}"), k]}, <%=nested%>_form.object.<%=hash[:name]%>), {<%=options[:presence].include?(hash[:name]) ? "" : "include_blank: true"%>}, {class: 'form-control'} %></td>
     <%- elsif hash[:type] == :image || hash[:type] == :file -%>
         <td data-hook="col-<%= hash[:name] %>">
           <%- if hash[:type] == :image -%>

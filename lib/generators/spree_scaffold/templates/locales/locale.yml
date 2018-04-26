@@ -2,13 +2,13 @@
   spree:
     admin:
       tab:
-        <%= plural_name %>: "<%= @name || class_name.pluralize.titleize %>"
-    new_<%= singular_name %>: "New <%= @name || class_name.titleize %>"
-    listing_<%= plural_name %>: "Listing <%= @name || class_name.pluralize.titleize %>"
-    editing_<%= singular_name %>: "Editing <%= @name || class_name.titleize %>"
+        <%= plural_name %>: "<%= @plural_title %>"
+    new_<%= singular_name %>: "New <%= @singular_title %>"
+    listing_<%= plural_name %>: "Listing <%= @plural_title %>"
+    editing_<%= singular_name %>: "Editing <%= @singular_title %>"
   activerecord:
     models:
-      spree/<%= singular_name %>: "<%= @name || singular_name %>"
+      spree/<%= singular_name %>: "<%= @singular_title %>"
     errors:
       models:
         spree/<%= singular_name %>:

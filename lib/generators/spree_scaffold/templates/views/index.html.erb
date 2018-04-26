@@ -25,11 +25,15 @@
   <thead>
     <tr data-hook="admin_<%= plural_name %>_index_headers">
 <%- if sortable? -%>
-      <th class="no-border"></th>
+       <th class="no-border"></th>
 <%- end -%>
 <%- attributes.each do |attribute| -%>
-  <%- if (attribute.type == :string && attribute.name != "slug") || attribute.type == :boolean || (attribute.type == :integer && attribute.name != "position" && !(options[:fk].values.include?(attribute.name))) || attribute.type == :datetime || attribute.type == :image || attribute.type == :float  -%>
+  <%- if (attribute.type == :string && attribute.name != "slug") || attribute.type == :boolean || (attribute.type == :integer && attribute.name != "position" && !(options[:fk].values.include?(attribute.name))) || attribute.type == :image  || attribute.type == :datetime  || attribute.type == :float  -%>
+    <%- if attribute.type == :image -%>
+      <th><%%=t(:<%= attribute.name %>, scope: 'activerecord.attributes.spree/<%= singular_name %>')%></th>
+    <%- else -%>
       <th><%%=sort_link(@search, :<%= attribute.name %>, t(:<%= attribute.name %>, scope: 'activerecord.attributes.spree/<%= singular_name %>') , default_order: :desc)%></th>
+    <%- end -%>
   <%- end -%>
 <%- end -%>
       <th data-hook="admin_<%= plural_name %>_index_header_actions" class="actions text-center"><%%=Spree.t("scaffold.actions")%></th>
