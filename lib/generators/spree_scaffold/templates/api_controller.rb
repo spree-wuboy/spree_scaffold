@@ -25,11 +25,6 @@ module Spree
           respond_with(@<%=singular_name%>, :status => 204)
         end
 
-        def index
-          @<%=plural_name%> = Spree::<%=class_name%>.accessible_by(current_ability, :read).ransack(params[:q]).result.page(params[:page]).per(params[:per_page])
-          respond_with(@<%=singular_name%>)
-        end
-
         def show
           respond_with(@<%=singular_name%>)
         end

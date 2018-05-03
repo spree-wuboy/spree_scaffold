@@ -28,7 +28,7 @@ module Spree
           format.csv {
             data = @collection.to_csv({}, params.to_unsafe_h)
             require 'iconv'
-            data = Iconv.new("big5//IGNORE", "utf-8").iconv(data) #remove this if you won't use excel to open csv in traditional Chinese
+            # data = Iconv.new("big5//IGNORE", "utf-8").iconv(data) #remove this if you won't use excel to open csv in traditional Chinese
             send_data data, :filename => "#{singular_name}_#{Time.now.to_i.to_s}.csv",
                       :disposition => 'inline', :type => "text/csv"
           }

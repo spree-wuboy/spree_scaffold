@@ -11,7 +11,7 @@
       <%- if attribute.type == :datetime -%>
           <div class="date-range-filter col-md-8  <%=column%>-column-range">
             <div class="form-group">
-              <%%= label_tag :<%=attribute.name%>_range, "#{I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>")}#{Spree.t(:date_range)}" %>
+              <%%= label_tag :<%=attribute.name%>_range, "#{I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>")} #{Spree.t(:date_range)}" %>
               <div class="row no-padding-bottom">
                 <div class="col-md-6">
                   <div class="input-group">
@@ -34,9 +34,12 @@
               <%%= f.label :<%=column%>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=column%>") %>
               <%- if options[:fk].values.include?(column) -%>
                   <%- fk_class_name = "Spree::#{options[:fk].invert[column].camelcase}" -%>
-                  <%% if defined?(<%=fk_class_name%>) %>
-                  <%%= f.select :<%= column %>_eq, options_for_select(@search_<%=column%>_options, params[:q][:<%= column %>_eq]), {include_blank: true}, {class: 'form-control'} %>
-                  <%% end %>
+                  <%%= f.hidden_field :<%= attribute.name %>_eq, :class => "select2-picker",
+                  "data-multiple"=> false,
+                  "data-url" => api_v1_<%=options[:fk].invert[attribute.name].pluralize%>_path,
+                  "data-name" => <%=fk_class_name%>.column_names.include?("name") ? "name" : "id",
+                  "data-query" => <%=fk_class_name%>.column_names.include?("name") ? "name_cont" : "id_eq",
+                  "data-objects" => "<%=options[:fk].invert[attribute.name].pluralize%>"%>
               <%- elsif options[:enum].keys.include?(column) -%>
                   <%%= f.select :<%= column %>_eq, options_for_select(Spree::<%=class_name%>.<%=column.pluralize%>.map{|k,v| [I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=column.pluralize%>.#{k}"), v]}), {include_blank: true}, {class: 'form-control'} %>
               <%- elsif attribute.type == :boolean -%>

@@ -13,9 +13,9 @@ en:
       say_no: no
       say_true: yes
       say_false: no
-      print: print
-      batch: batch
-      export: export
+      print: "Print"
+      batch: "Batch"
+      export: "Export"
       search_checked: "search only checked records"
       search_checked_count: "search only checked %{count} records"
       menu: "new functions"

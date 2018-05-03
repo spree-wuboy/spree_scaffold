@@ -11,7 +11,12 @@
         <%- if options[:presence].include?(attribute.name) -%>
           <abbr style="color: red">*</abbr>
         <%- end -%>
-          <%%= f.select :<%= attribute.name %>, options_for_select(@select_<%=attribute.name%>.map { |s| [s.id, s.id] }, f.object.<%=attribute.name%>), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
+          <%%= f.hidden_field :<%= attribute.name %>, :class => "select2-picker",
+            "data-multiple"=> false,
+            "data-url" => api_v1_<%=options[:fk].invert[attribute.name].pluralize%>_path,
+            "data-name" => <%=fk_class_name%>.column_names.include?("name") ? "name" : "id",
+            "data-query" => <%=fk_class_name%>.column_names.include?("name") ? "name_cont" : "id_eq",
+            "data-objects" => "<%=options[:fk].invert[attribute.name].pluralize%>"%>
         <%% end %>
   <%- elsif options[:enum].keys.include?(attribute.name) -%>
         <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
@@ -101,10 +106,10 @@
       <%- if @nested_hash[nested].map{|h| h[:name]}.include?("position") -%>
         <th class="no-border"></th>
       <%- end -%>
-  <%- @nested_hash[nested].map{|h| h[:name]}.each do |name| -%>
-    <%- if name != 'position' && name != "#{singular_name}_id" -%>
+  <%- @nested_hash[nested].each do |hash| -%>
+    <%- if hash[:name]  != 'position' && hash[:name]  != "#{singular_name}_id" -%>
         <th>
-          <%%= label_tag I18n.t(:<%=name%>, :scope => 'activerecord.attributes.spree/<%=nested.singularize%>') %>
+          <%%= label_tag I18n.t(:<%=hash[:name] %>, :scope => 'activerecord.attributes.spree/<%=nested.singularize%>') %><%=hash[:presence] ? '<abbr style="color: red">*</abbr>' : ''%>
         </th>
     <%- end -%>
   <%- end -%>

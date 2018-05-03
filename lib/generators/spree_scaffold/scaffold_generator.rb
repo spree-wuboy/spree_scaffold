@@ -260,7 +260,10 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
               nested_options_map && nested_options_map.each do |op|
                 nested_options[op.split("=")[0].to_sym] = op.split("=")[1].sub(/ $/, "")
               end
-              @nested_hash[nested] = line.gsub("spree:scaffold", "spree_scaffold:scaffold").gsub("rails g spree_scaffold:scaffold #{nested.singularize}", "").gsub(/--.*/, "").split(" ").map {|s| {:name => s.split(":")[0], :type => s.split(":")[1].to_sym, :enum => nested_options[:enum] && nested_options[:enum].split(" ") && nested_options[:enum].split(" ").map{|o| o.split(":")[0]}.include?(s.split(":")[0])}}
+              @nested_hash[nested] = line.gsub("spree:scaffold", "spree_scaffold:scaffold").gsub("rails g spree_scaffold:scaffold #{nested.singularize}", "")
+                                         .gsub(/--.*/, "").split(" ").map {|s| {:name => s.split(":")[0], :type => s.split(":")[1].to_sym,
+                                                                                :presence => nested_options[:presence] && nested_options[:presence].split(" ") && nested_options[:presence].split(" ").include?(s.split(":")[0]),
+                                                                                :enum => nested_options[:enum] && nested_options[:enum].split(" ") && nested_options[:enum].split(" ").map{|o| o.split(":")[0]}.include?(s.split(":")[0])}}
             end
           end
         end

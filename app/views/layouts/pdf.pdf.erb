@@ -12,12 +12,27 @@
       src: url('<%= SpreeScaffold::Engine.root.join('app', 'assets', 'fonts', 'WCL-02.ttf') %>') format('truetype')
     }
 
+    @font-face {
+      font-family: "Helvetica";
+      src: url('<%= SpreeScaffold::Engine.root.join('app', 'assets', 'fonts', 'Helvetica-Regular.ttf') %>') format('truetype');
+    }
+
+    @font-face {
+      font-family: "Helvetica";
+      src: url('<%= SpreeScaffold::Engine.root.join('app', 'assets', 'fonts', 'Helvetica-Bold.ttf') %>') format('truetype');
+      font-weight: 600;
+    }
+
     body {
-      font-family: 'WCL';
+    <% if I18n.locale == 'zh' %>
+      font-family: 'Helvetica', 'WCL';
+    <% else %>
+      font-family: 'Helvetica';
+    <% end %>
     }
   </style>
 </head>
 <body>
-  <%= yield %>
+<%= yield %>
 </body>
 </html>

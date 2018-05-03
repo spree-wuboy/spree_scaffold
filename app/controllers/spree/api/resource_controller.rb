@@ -3,8 +3,41 @@ module Spree
     class ResourceController < BaseController
       before_action :load_resource
 
-      protected
+      def index
+        respond_with(@collection)
+      end
 
+      def show
+        respond_with(@object)
+      end
+
+      def update
+        authorize! :update, @object
+        if @object.update_attributes(map_nested_attributes_keys(model_class, object_params))
+          respond_with(@object, :status => 200, :default_template => :show)
+        else
+          invalid_resource!(@object)
+        end
+      end
+
+      def create
+        authorize! :create, model_class
+        @object = model_class.new(map_nested_attributes_keys(model_class, object_params))
+        instance_variable_set("@#{object_name}", @object)
+        if @object.save
+          respond_with(@object, :status => 201, :default_template => :show)
+        else
+          invalid_resource!(@object)
+        end
+      end
+
+      def destroy
+        authorize! :destroy, @pbject
+        @pbject.destroy
+        respond_with(@pbject, :status => 204)
+      end
+
+      protected
 
       def collection_actions
         [:index]
@@ -27,6 +60,10 @@ module Spree
 
       private
 
+      def object_params
+        params.require(object_name.to_sym).permit!
+      end
+
       def sub_namespace_parts
         controller_path.split('/')[1..-2]
       end
@@ -41,7 +78,11 @@ module Spree
       end
 
       def collection
-        model_class.where(nil)
+        if params[:ids]
+          model_class.accessible_by(current_ability, :read).where(id: params[:ids].split(',').flatten).distinct.page(params[:page]).per(params[:per_page])
+        else
+          model_class.accessible_by(current_ability, :read).ransack(params[:q]).result
+        end
       end
 
       def load_resource

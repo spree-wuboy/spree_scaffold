@@ -15,10 +15,26 @@ module Spree
       end
 
       # csv
+      def self.csv_headers
+        csv_column_hash.map(&:name)
+      end
+
+      def self.csv_column_hash
+        self.columns
+      end
+
+      def self.csv_columns(object)
+        csv_column_hash.map{|column| csv_value(object,column)}
+      end
+
+      def self.csv_value(object, column)
+        object.send(column.name)
+      end
+
       def self.to_csv(options={}, params={})
         require 'csv'
         CSV.generate(options) do |csv|
-          if params[:q]
+          if params[:q] && params[:q].size > 0
             params[:q].delete(:s)
             conditions = []
             conditions.push(Spree.t("scaffold.report_search_criteria"))
@@ -27,11 +43,11 @@ module Spree
               conditions = []
               if value.present?
                 with_type = get_condition_type(key)
-                if with_type[:type] == :boolean || key == "checked"
+                if with_type[:type] == :boolean || key == "checked" || key.match(/_null$/)
                   value = Spree.t("scaffold.say_#{value.to_bool}")
                 end
-                condition_name = key == "checked" ? Spree.t("scaffold.search_checked") : I18n.t("activerecord.attributes.#{self.name.underscore}.#{with_type[:name] || key}")
-                conditions.push("#{condition_name}#{with_type[:condition] ? Spree.t("scaffold.conditions.condition_#{with_type[:condition]}") : ''}")
+                condition_name = key == "checked" ? Spree.t("scaffold.search_checked") : with_type[:name] || key
+                conditions.push("#{condition_name}#{with_type[:condition] ? " - #{Spree.t("scaffold.conditions.condition_#{with_type[:condition]}")}" : ''}")
                 conditions.push(value)
                 csv << conditions
               end

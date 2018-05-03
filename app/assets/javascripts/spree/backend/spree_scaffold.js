@@ -61,7 +61,68 @@ function addParameter(url, parameterName, parameterValue, atStart/*Add param bef
     return urlParts[0] + newQueryString + urlhash;
 };
 
+$.fn.select2Autocomplete = function (options) {
+    'use strict';
+
+    // Default options
+    options = options || {};
+    var multiple = typeof(options.multiple) !== 'undefined' ? options.multiple : true;
+
+    function formatSelect2(data) {
+        if (options.name.indexOf(".") != -1) {
+            var dd = data, names = options.name.split(".");
+            for (var i=0;i<names.length; i++) {
+                dd = dd[names[i]];
+            }
+            return Select2.util.escapeMarkup(dd || data["id"]);
+        } else {
+            return Select2.util.escapeMarkup(data[options.name || "id"]);
+        }
+    }
+
+    this.select2({
+        minimumInputLength: options["minimum-input-length"] || 3,
+        multiple: multiple,
+        initSelection: function (element, callback) {
+            $.get(options.url, {
+                ids: element.val().split(','),
+                token: Spree.api_key
+            }, function (data) {
+                callback(multiple ? data[options.objects] : data[options.objects][0]);
+            });
+        },
+        ajax: {
+            url: options.url,
+            datatype: 'json',
+            cache: true,
+            data: function (term, page) {
+                var q = {}
+                q[options.query || "id_cont"] = term;
+                return {
+                    q: q,
+                    m: 'OR',
+                    token: Spree.api_key
+                };
+            },
+            results: function (data, page) {
+                var objects = data[options.objects] ? data[options.objects] : [];
+                return {
+                    results: objects
+                };
+            }
+        },
+        formatResult: formatSelect2,
+        formatSelection: formatSelect2
+    });
+};
+
 $(document).ready(function () {
+
+    $('.select2-picker').each(function() {
+        if ($(this).parents(".nested-template").length == 0) {
+            $(this).select2Autocomplete($(this).data());
+        }
+    });
 
     $(".batch-button").click(function () {
         if ($(this).attr("href")) {
@@ -97,6 +158,9 @@ $(document).ready(function () {
             el.prop('href', '#');
         })
         appender.append(new_table_row);
+        new_table_row.find('.select2-picker').each(function() {
+            $(this).select2Autocomplete($(this).data());
+        });
     });
 
     $('body').on('click', 'a.spree_remove_sub_fields', function () {
