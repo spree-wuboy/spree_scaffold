@@ -14,6 +14,7 @@ en:
       say_true: yes
       say_false: no
       print: "Print"
+      list: "List"
       batch: "Batch"
       export: "Export"
       search_checked: "search only checked records"
