@@ -1,0 +1,41 @@
+<div class="row">
+  <div class="col-md-12">
+    <form id="my-upload" action="/tinymce/upload" method="post">
+      <textarea name="urls" style="width: 100%" rows="20"></textarea>
+      <div>* pass your URLs here (each line).</div>
+      <button type="submit" class="btn btn-primary btn-lg" id="insert-image"><%= Spree.t(:insert_image) %></button>
+    </form>
+  </div>
+</div>
+
+<% content_for :foot do %>
+
+  <script>
+      $(document).ready(function () {
+
+
+// this is the id of the form
+          $("#my-upload").submit(function(e) {
+
+              var url = $(this).attr("action"); // the script where you handle the form input.
+              $.ajax({
+                  type: "POST",
+                  url: url,
+                  dataType: 'json',
+                  data: $(this).serialize(), // serializes the form's elements.
+                  success: function(results) {
+                      var $content = $("<div>");
+                      $.each(results, function (index, result) {
+                          $content.append("<img src='" + result.url + "'/>");
+                      });
+                      parent.tinymce.activeEditor.insertContent($content[0].outerHTML);
+                      parent.tinymce.activeEditor.nodeChanged();
+                      parent.tinymce.activeEditor.windowManager.close();
+                  }
+              });
+
+              e.preventDefault(); // avoid to execute the actual submit of the form.
+          });
+      });
+  </script>
+<% end %>

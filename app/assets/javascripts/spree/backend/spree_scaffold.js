@@ -1,3 +1,7 @@
+//= require tinymce
+//= require tinymce/dropzone
+//= require tinymce/insert
+//= require tinymce/plugins
 //= require spree/backend/jquery_ujs.prompt
 
 function removeParameter(url, parameterName) {
@@ -117,6 +121,31 @@ $.fn.select2Autocomplete = function (options) {
 };
 
 $(document).ready(function () {
+
+
+    tinymce.init({
+        content_css: css_path,
+        language: 'en',
+        selector: ".tinymce-div",
+        plugins: "link advlist code autolink table lists colorpicker insertdatetime wordcount charmap autolink hr anchor pagebreak textcolor responsivefilemanager responsivefilemanager2 youtube localautosave preview mobilepreview",
+        toolbar1: "undo redo |  bullist numlist outdent indent | image media | responsivefilemanager responsivefilemanager2 | youtube | localautosave | preview mobilepreview",
+        toolbar2: "styleselect | bold italic underline | fontsizeselect forecolor backcolor",
+        plugin_preview_width: 1000,
+        relative_urls: false,
+        setup: function (ed) {
+            ed.on('keydown',function(e) {
+                if(e.keyCode == 13){
+                    if(ed.dom.hasClass(ed.selection.getNode(), 'youtube')){
+                        ed.selection.setContent('<div>&nbsp;</div>');
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            });
+        }
+    });
+
 
     $('.select2-picker').each(function() {
         if ($(this).parents(".nested-template").length == 0) {

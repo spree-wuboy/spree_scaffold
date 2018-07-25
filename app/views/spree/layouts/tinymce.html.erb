@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-TW">
+<!--[if lt IE 7 ]> <html class="ie ie6" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if IE 7 ]>    <html class="ie ie7" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if IE 8 ]>    <html class="ie ie8" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if IE 9 ]>    <html class="ie ie9" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if gt IE 9]><!-->
+<html lang="<%= I18n.locale %>"><!--<![endif]-->
+<head data-hook="inside_head">
+  <%= stylesheet_link_tag 'tinymce/insert', :media => 'screen' %>
+</head>
+<body class="<%= body_class %>" id="<%= controller_name %>" data-hook="body">
+<div id="content">
+  <div class="container">
+    <%= yield %>
+  </div>
+</div>
+<%=javascript_include_tag 'tinymce/insert' %>
+
+<% if content_for?(:foot) %>
+    <%= yield :foot %>
+<% end %>
+
+</body>
+</html>

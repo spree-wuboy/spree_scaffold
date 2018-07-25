@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'wkhtmltopdf-binary'
   s.add_dependency 'wicked_pdf', '1.0.6'
   s.add_dependency 'faker'
+  s.add_dependency 'tinymce-rails'
   if RUBY_PLATFORM != 'java'
     s.add_dependency 'iconv'
   end

@@ -15,6 +15,7 @@ en:
       say_false: no
       print: "Print"
       list: "List"
+      list_pdf: "List(PDF)"
       batch: "Batch"
       export: "Export"
       search_checked: "search only checked records"

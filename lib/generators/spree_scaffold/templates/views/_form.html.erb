@@ -2,7 +2,7 @@
 <%- attributes.each do |attribute| -%>
 <%- next if (attribute.name == 'position' && attribute.type == :integer) || attribute.name == 'slug' || attribute.name == 'deleted_at' -%>
   <div  class="row">
-    <div class="col-md-6" data-hook="col-<%= attribute.name %>">
+    <div class="<%=options[:full_width] ? 'col-md-12' : 'col-md-6'%>" data-hook="col-<%= attribute.name %>">
       <%%= f.field_container :<%= attribute.name %>, class: ['form-group'] do %>
   <%- if options[:fk].values.include?(attribute.name) -%>
       <%- fk_class_name = "Spree::#{options[:fk].invert[attribute.name].camelcase}" -%>
@@ -71,7 +71,7 @@
       <%- if options[:presence].include?(attribute.name) -%>
         <abbr style="color: red">*</abbr>
       <%- end -%>
-        <%%= f.text_area :<%= attribute.name %>,  class: 'form-control' %>
+        <%%= f.text_area :<%= attribute.name %>,  class: 'form-control <%=options[:html].include?(attribute.name) ? 'tinymce-div' : ''%>' %>
   <%- elsif attribute.type == :float  -%>
         <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
       <%- if options[:presence].include?(attribute.name) -%>
@@ -155,7 +155,7 @@
     <%- elsif hash[:type] == :integer -%>
         <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control', step: 1 %></td>
     <%- elsif hash[:type] == :text  -%>
-        <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.text_area :<%= hash[:name] %>,  class: 'form-control' %></td>
+        <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.text_area :<%= hash[:name] %>,  class: 'form-control <%=hash[:html] ? 'tinymce-div' : ''%>' %></td>
     <%- elsif hash[:type] == :float -%>
         <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control' %></td>
     <%- else -%>

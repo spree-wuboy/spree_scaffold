@@ -17,10 +17,12 @@ module SpreeScaffold
       class_option :skip_timestamps, type: :boolean, default: false, required: false, desc: 'skip timestamps'
       class_option :presence, type: :array, default: [], required: false, desc: 'validate presence'
       class_option :unique, type: :array, default: [], required: false, desc: 'validate uniqueness'
+      class_option :html, type: :array, default: [], required: false, desc: 'tinymce html editor fields (html:text_field1,text_field2,text_field3)'
       class_option :nested, type: :array, default: [], required: false, desc: 'nested attributes(comments, ingredients), you must make sure log/scaffold.log already have the class'
       class_option :cache, type: :boolean, default: false, required: false, desc: 'make a simple cache mechanism'
       class_option :model_class, type: :string, required: false, desc: 'different model class than Spree::Model'
       class_option :add_by, type: :boolean, default: false, required: false, desc: 'add created_by and updated_at'
+      class_option :full_width, type: :boolean, default: false, required: false, desc: 'full width form'
       class_option :gen, type: :string, required: false, desc: 'generate type, default is false, you can use v(view), m(migration+model), c(controller), o(override). e.g. vm will generate view, model, and migration'
 
       def self.next_migration_number(path)
@@ -99,6 +101,11 @@ module SpreeScaffold
 
           if nested?
             inject_into_file "app/assets/javascripts/spree/backend/all.js", "//= require spree/backend/spree_scaffold\n", before: /\/\/= require_tree/
+          end
+
+          if string_index_columns.any?
+            empty_directory "app/assets/javascripts/spree/backend/pickers"
+            template "assets/javascripts/spree/backend/pickers/picker.js", "app/assets/javascripts/spree/backend/pickers/#{singular_name}_picker.js"
           end
         end
       end
@@ -228,6 +235,10 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
         values.index(value)
       end
 
+      def string_index_columns
+        self.attributes.select {|a| a.type == :string && options[:search].include?(a.name)}.map{|a| a.name}
+      end
+
       def presence_not_boolean
         options[:presence].select {|p| self.attributes_hash[p].type != :boolean}
       end
@@ -263,6 +274,7 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
               @nested_hash[nested] = line.gsub("spree:scaffold", "spree_scaffold:scaffold").gsub("rails g spree_scaffold:scaffold #{nested.singularize}", "")
                                          .gsub(/--.*/, "").split(" ").map {|s| {:name => s.split(":")[0], :type => s.split(":")[1].to_sym,
                                                                                 :presence => nested_options[:presence] && nested_options[:presence].split(" ") && nested_options[:presence].split(" ").include?(s.split(":")[0]),
+                                                                                :html => nested_options[:html] && nested_options[:html].split(" ") && nested_options[:html].split(" ").include?(s.split(":")[0]),
                                                                                 :enum => nested_options[:enum] && nested_options[:enum].split(" ") && nested_options[:enum].split(" ").map{|o| o.split(":")[0]}.include?(s.split(":")[0])}}
             end
           end

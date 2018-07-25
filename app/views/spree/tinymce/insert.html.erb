@@ -1,0 +1,58 @@
+<div class="row">
+  <div class="col-md-12">
+    <form id="my-upload" class="dropzone" action="/tinymce/upload" enctype='multipart/form-data' method="post">
+      <div class="fallback">
+        <input type="file" name="images"/>
+      </div>
+    </form>
+  </div>
+</div>
+<div id="uploads" class="row"></div>
+<div id="preview-template" style="display: none">
+  <div class="dz-preview dz-file-preview">
+    <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+  </div>
+</div>
+
+<div style="clear: both"></div>
+<button type="button" class="btn btn-primary" id="insert-image"><%= Spree.t(:insert_image) %></button>
+
+<% content_for :foot do %>
+    <script>
+        Dropzone.options.myUpload = {
+            dictDefaultMessage: '<%=Spree.t(:choose_or_drag_image)%>',
+            uploadMultiple: true,
+            previewTemplate: document.getElementById('preview-template').innerHTML,
+            previewsContainer: '#uploads',
+            paramName: "images[]",
+            successmultiple: function (file, results) {
+                $.each(results, function (index, result) {
+                    $("#uploads").append($("<div class='col-md-1'><a href='#' class='image selected'><div class='img' style='background-image: url("+ result.mini_url +")' data-original='" + result.url + "' data-title=''/></a></div>"));
+                })
+            }
+        }
+    </script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('#uploads').on('click', '.image', function () {
+                $(this).addClass("selected");
+            })
+
+            $("#insert-image").click(function (e) {
+                e.preventDefault();
+                selected_images = $('#uploads .image.selected');
+                var $content = $("<div>");
+                $.each(selected_images, function () {
+                    var $img = $(this).find("div.img");
+                    var original = $img.attr("data-original");
+                    $content.append("<img src='" + original + "'/>");
+                });
+                parent.tinymce.activeEditor.insertContent($content[0].outerHTML);
+                parent.tinymce.activeEditor.nodeChanged();
+                parent.tinymce.activeEditor.windowManager.close();
+            });
+        });
+    </script>
+<% end %>

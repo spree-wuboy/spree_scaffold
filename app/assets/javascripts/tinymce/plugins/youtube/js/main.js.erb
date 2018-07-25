@@ -1,0 +1,262 @@
+/*!
+ * bootstrap.js v3.0.0 by @fat and @mdo
+ * Copyright 2013 Twitter Inc.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+if (!jQuery)throw new Error("Bootstrap requires jQuery");
++function (t) {
+
+}(window.jQuery), /*!
+ * mustache.js - Logic-less {{mustache}} templates with JavaScript
+ * http://github.com/janl/mustache.js
+ */
+    function (t, e) {
+        if ("object" == typeof exports && exports)e(exports); else {
+            var i = {};
+            e(i), "function" == typeof define && define.amd ? define(i) : t.Mustache = i
+        }
+    }(this, function (t) {
+        function e(t, e) {
+            return b.call(t, e)
+        }
+
+        function i(t) {
+            return !e(v, t)
+        }
+
+        function n(t) {
+            return t.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&")
+        }
+
+        function o(t) {
+            return String(t).replace(/[&<>"'\/]/g, function (t) {
+                return C[t]
+            })
+        }
+
+        function s(t) {
+            this.string = t, this.tail = t, this.pos = 0
+        }
+
+        function a(t, e) {
+            this.view = t || {}, this.parent = e, this._cache = {}
+        }
+
+        function r() {
+            this.clearCache()
+        }
+
+        function l(e, i, n, o) {
+            for (var s, a, r, h = "", c = 0, p = e.length; p > c; ++c)switch (s = e[c], a = s[1], s[0]) {
+                case"#":
+                    if (r = n.lookup(a), "object" == typeof r)if ($(r))for (var f = 0, u = r.length; u > f; ++f)h += l(s[4], i, n.push(r[f]), o); else r && (h += l(s[4], i, n.push(r), o)); else if ("function" == typeof r) {
+                        var d = null == o ? null : o.slice(s[3], s[5]);
+                        r = r.call(n.view, d, function (t) {
+                            return i.render(t, n)
+                        }), null != r && (h += r)
+                    } else r && (h += l(s[4], i, n, o));
+                    break;
+                case"^":
+                    r = n.lookup(a), (!r || $(r) && 0 === r.length) && (h += l(s[4], i, n, o));
+                    break;
+                case">":
+                    r = i.getPartial(a), "function" == typeof r && (h += r(n));
+                    break;
+                case"&":
+                    r = n.lookup(a), null != r && (h += r);
+                    break;
+                case"name":
+                    r = n.lookup(a), null != r && (h += t.escape(r));
+                    break;
+                case"text":
+                    h += a
+            }
+            return h
+        }
+
+        function h(t) {
+            for (var e, i = [], n = i, o = [], s = 0, a = t.length; a > s; ++s)switch (e = t[s], e[0]) {
+                case"#":
+                case"^":
+                    o.push(e), n.push(e), n = e[4] = [];
+                    break;
+                case"/":
+                    var r = o.pop();
+                    r[5] = e[2], n = o.length > 0 ? o[o.length - 1][4] : i;
+                    break;
+                default:
+                    n.push(e)
+            }
+            return i
+        }
+
+        function c(t) {
+            for (var e, i, n = [], o = 0, s = t.length; s > o; ++o)e = t[o], e && ("text" === e[0] && i && "text" === i[0] ? (i[1] += e[1], i[3] = e[3]) : (i = e, n.push(e)));
+            return n
+        }
+
+        function p(t) {
+            return [new RegExp(n(t[0]) + "\\s*"), new RegExp("\\s*" + n(t[1]))]
+        }
+
+        function f(e, o) {
+            function a() {
+                if (T && !E)for (; x.length;)delete k[x.pop()]; else x = [];
+                T = !1, E = !1
+            }
+
+            if (e = e || "", o = o || t.tags, "string" == typeof o && (o = o.split(d)), 2 !== o.length)throw new Error("Invalid tags: " + o.join(", "));
+            for (var r, l, f, v, b, w = p(o), $ = new s(e), C = [], k = [], x = [], T = !1, E = !1; !$.eos();) {
+                if (r = $.pos, f = $.scanUntil(w[0]))for (var D = 0, S = f.length; S > D; ++D)v = f.charAt(D), i(v) ? x.push(k.length) : E = !0, k.push(["text", v, r, r + 1]), r += 1, "\n" == v && a();
+                if (!$.scan(w[0]))break;
+                if (T = !0, l = $.scan(y) || "name", $.scan(u), "=" === l ? (f = $.scanUntil(m), $.scan(m), $.scanUntil(w[1])) : "{" === l ? (f = $.scanUntil(new RegExp("\\s*" + n("}" + o[1]))), $.scan(g), $.scanUntil(w[1]), l = "&") : f = $.scanUntil(w[1]), !$.scan(w[1]))throw new Error("Unclosed tag at " + $.pos);
+                if (b = [l, f, r, $.pos], k.push(b), "#" === l || "^" === l)C.push(b); else if ("/" === l) {
+                    if (0 === C.length)throw new Error('Unopened section "' + f + '" at ' + r);
+                    var j = C.pop();
+                    if (j[1] !== f)throw new Error('Unclosed section "' + j[1] + '" at ' + r)
+                } else if ("name" === l || "{" === l || "&" === l)E = !0; else if ("=" === l) {
+                    if (o = f.split(d), 2 !== o.length)throw new Error("Invalid tags at " + r + ": " + o.join(", "));
+                    w = p(o)
+                }
+            }
+            var j = C.pop();
+            if (j)throw new Error('Unclosed section "' + j[1] + '" at ' + $.pos);
+            return k = c(k), h(k)
+        }
+
+        var u = /\s*/, d = /\s+/, v = /\S/, m = /\s*=/, g = /\s*\}/, y = /#|\^|\/|>|\{|&|=|!/, b = RegExp.prototype.test, w = Object.prototype.toString, $ = Array.isArray || function (t) {
+                return "[object Array]" === w.call(t)
+            }, C = {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "/": "&#x2F;"};
+        s.prototype.eos = function () {
+            return "" === this.tail
+        }, s.prototype.scan = function (t) {
+            var e = this.tail.match(t);
+            return e && 0 === e.index ? (this.tail = this.tail.substring(e[0].length), this.pos += e[0].length, e[0]) : ""
+        }, s.prototype.scanUntil = function (t) {
+            var e, i = this.tail.search(t);
+            switch (i) {
+                case-1:
+                    e = this.tail, this.pos += this.tail.length, this.tail = "";
+                    break;
+                case 0:
+                    e = "";
+                    break;
+                default:
+                    e = this.tail.substring(0, i), this.tail = this.tail.substring(i), this.pos += i
+            }
+            return e
+        }, a.make = function (t) {
+            return t instanceof a ? t : new a(t)
+        }, a.prototype.push = function (t) {
+            return new a(t, this)
+        }, a.prototype.lookup = function (t) {
+            var e = this._cache[t];
+            if (!e) {
+                if ("." == t)e = this.view; else for (var i = this; i;) {
+                    if (t.indexOf(".") > 0) {
+                        e = i.view;
+                        for (var n = t.split("."), o = 0; e && o < n.length;)e = e[n[o++]]
+                    } else e = i.view[t];
+                    if (null != e)break;
+                    i = i.parent
+                }
+                this._cache[t] = e
+            }
+            return "function" == typeof e && (e = e.call(this.view)), e
+        }, r.prototype.clearCache = function () {
+            this._cache = {}, this._partialCache = {}
+        }, r.prototype.compile = function (e, i) {
+            var n = this._cache[e];
+            if (!n) {
+                var o = t.parse(e, i);
+                n = this._cache[e] = this.compileTokens(o, e)
+            }
+            return n
+        }, r.prototype.compilePartial = function (t, e, i) {
+            var n = this.compile(e, i);
+            return this._partialCache[t] = n, n
+        }, r.prototype.getPartial = function (t) {
+            return t in this._partialCache || !this._loadPartial || this.compilePartial(t, this._loadPartial(t)), this._partialCache[t]
+        }, r.prototype.compileTokens = function (t, e) {
+            var i = this;
+            return function (n, o) {
+                if (o)if ("function" == typeof o)i._loadPartial = o; else for (var s in o)i.compilePartial(s, o[s]);
+                return l(t, i, a.make(n), e)
+            }
+        }, r.prototype.render = function (t, e, i) {
+            return this.compile(t)(e, i)
+        }, t.name = "mustache.js", t.version = "0.7.2", t.tags = ["{{", "}}"], t.Scanner = s, t.Context = a, t.Writer = r, t.parse = f, t.escape = o;
+        var k = new r;
+        t.clearCache = function () {
+            return k.clearCache()
+        }, t.compile = function (t, e) {
+            return k.compile(t, e)
+        }, t.compilePartial = function (t, e, i) {
+            return k.compilePartial(t, e, i)
+        }, t.compileTokens = function (t, e) {
+            return k.compileTokens(t, e)
+        }, t.render = function (t, e, i) {
+            return k.render(t, e, i)
+        }, t.to_html = function (e, i, n, o) {
+            var s = t.render(e, i, n);
+            return "function" != typeof o ? s : void o(s)
+        }
+    }), function (t) {
+    function e(t) {
+        var e = t.match(/^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+        return e && 11 === e[2].length ? e[2] : !1
+    }
+
+    function i(t, i) {
+        var n = e(t);
+        return t && n && (t = "https://www.youtube.com/" + (i ? "embed/" : "v/") + e(t)), t
+    }
+
+    function n(t, e, i, n) {
+        var o, s;
+        return n && (o = 'width="' + e + '" height="' + i + '"', s = t ? '<iframe src="' + n + '" ' + o + ' frameborder="0" allowfullscreen>&nbsp;</iframe>' : '<div class="youtube"><object type="application/x-shockwave-flash" ' + o + ' data="' + n + '&modestbranding=1"><param name="movie" value="' + n + '&modestbranding=1" /><param name="wmode" value="transparent" /></object></div><div></div>'), s
+    }
+
+    function o() {
+        var e, o = "", s = t("#video").is(":checked"), a = t("#youtubeAutoplay").is(":checked"), r = t("#youtubeREL").is(":checked"), l = t("#youtubeHD").is(":checked"), h = t("#youtubeWidth").val(), c = t("#youtubeHeight").val(), p = i(t("#youtubeID").val(), s);
+        return a && (o += "&amp;autoplay=1"), r && (o += "&amp;rel=0"), l && (o += "&amp;hd=1"), p && (e = n(s, h, c, p + (s ? "" : o))), e
+    }
+
+    function s() {
+    }
+
+    function a(t) {
+        clearTimeout(h), h = setTimeout(s, t || 1e3)
+    }
+
+    function r() {
+        var t = o();
+        t && parent.tinymce.activeEditor.insertContent(t), parent.tinymce.activeEditor.windowManager.close()
+    }
+
+    function l() {
+        t("#preview").length && t("#youtubeID").keypress(function () {
+            a()
+        }).change(function () {
+            a(100)
+        })
+    }
+
+    var h;
+    t(function () {
+        var e = {
+            youtubeurl: parent.tinymce.util.I18n.translate("Youtube URL"),
+            youtubeID: parent.tinymce.util.I18n.translate("Youtube ID"),
+            youtubeWidth: parent.tinymce.util.I18n.translate("width"),
+            youtubeHeight: parent.tinymce.util.I18n.translate("height"),
+            youtubeAutoplay: parent.tinymce.util.I18n.translate("autoplay"),
+            youtubeHD: parent.tinymce.util.I18n.translate("HD video"),
+            youtubeREL: parent.tinymce.util.I18n.translate("Related video"),
+            HTML5: parent.tinymce.util.I18n.translate("HTML5"),
+            Insert: parent.tinymce.util.I18n.translate("Insert")
+        };
+        t.get("<%=asset_path('tinymce/plugins/youtube/view/forms.html')%>", function (i) {
+            t("#template-container").append(Mustache.render(i, e)), l(), t("#insert-btn").on("click", r)
+        })
+    })
+}(jQuery);
