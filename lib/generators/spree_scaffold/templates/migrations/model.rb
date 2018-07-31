@@ -10,7 +10,7 @@ class CreateSpree<%= class_name.pluralize %> < ActiveRecord::Migration[5.0]
       t.<%= attribute.type %> :<%= attribute.name %> <%= options[:default].keys.include?(attribute.name) ? ", default: #{options[:enum].keys.include?(attribute.name) ? enum_index(attribute.name, options[:default][attribute.name]) : (attribute.type == :boolean || attribute.type == :integer) ? options[:default][attribute.name] : "'#{options[:default][attribute.name]}'"}" : ""%>
    <%- end -%>
 <% end -%>
-   <%- if add_by? -%>
+   <%- if updated_by? -%>
       t.integer :created_by_id
       t.integer :updated_by_id
    <%- end -%>

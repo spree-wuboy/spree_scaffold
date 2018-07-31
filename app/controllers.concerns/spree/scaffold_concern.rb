@@ -16,8 +16,7 @@ module Spree
       before_action :add_nested_build, only: [:edit, :new]
       create.fails :add_nested_build
       update.fails :add_nested_build
-      create.before :add_user_id
-      update.before :add_user_id
+      before_action :add_user_id, only: [:update, :create]
 
       def index
         respond_to do |format|
@@ -185,7 +184,7 @@ module Spree
       end
 
       def add_user_id
-        @object.user_id = spree_current_user.id if spree_current_user && @object.respond_to?(:user_id=)
+        @object.temp_user_id = spree_current_user.id if spree_current_user && @object.respond_to?(:temp_user_id=)
       end
     end
   end

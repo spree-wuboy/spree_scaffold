@@ -21,7 +21,7 @@ module SpreeScaffold
       class_option :nested, type: :array, default: [], required: false, desc: 'nested attributes(comments, ingredients), you must make sure log/scaffold.log already have the class'
       class_option :cache, type: :boolean, default: false, required: false, desc: 'make a simple cache mechanism'
       class_option :model_class, type: :string, required: false, desc: 'different model class than Spree::Model'
-      class_option :add_by, type: :boolean, default: false, required: false, desc: 'add created_by and updated_at'
+      class_option :updated_by, type: :boolean, default: false, required: false, desc: 'add created_by_id and updated_by_id'
       class_option :full_width, type: :boolean, default: false, required: false, desc: 'full width form'
       class_option :gen, type: :string, required: false, desc: 'generate type, default is false, you can use v(view), m(migration+model), c(controller), o(override). e.g. vm will generate view, model, and migration'
 
@@ -214,8 +214,8 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
         options[:locale].any?
       end
 
-      def add_by?
-        options[:add_by]
+      def updated_by?
+        options[:updated_by]
       end
 
       def i18n?

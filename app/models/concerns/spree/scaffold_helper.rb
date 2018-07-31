@@ -2,16 +2,18 @@ module Spree
   module ScaffoldHelper
     extend ActiveSupport::Concern
     included do
-      attr_accessor :user_id
+      attr_accessor :temp_user_id
       before_create :add_create_user
       before_save :add_update_user
+      belongs_to :created_by, :class_name => Spree.user_class.name, :foreign_key => "created_by_id"
+      belongs_to :updated_by, :class_name => Spree.user_class.name, :foreign_key => "updated_by_id"
 
       def add_create_user
-        self.created_by_id = user_id if user_id && respond_to?(:created_by_id)
+        self.created_by_id = temp_user_id if temp_user_id && respond_to?(:created_by_id)
       end
 
       def add_update_user
-        self.updated_by_id = user_id if user_id && respond_to?(:updated_by_id)
+        self.updated_by_id = temp_user_id if temp_user_id && respond_to?(:updated_by_id)
       end
 
       # csv
