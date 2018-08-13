@@ -155,15 +155,7 @@ $(document).ready(function () {
 
     $(".batch-button").click(function () {
         if ($(this).attr("href")) {
-
-            var ids = []
-            $(".checks input:checked").each(function() {
-                ids.push($(this).data("id"));
-            });
-            $(this).attr("href", removeParameter($(this).attr("href"), "checks"));
-            if (ids.length != 0) {
-                $(this).attr("href", addParameter($(this).attr("href"), "checks", ids.join(",")));
-            }
+            $(this).attr("href", addParameter($(this).attr("href"), "checked", true));
         }
     });
     $(".nested-template").hide().find("input, select, textarea").prop("disabled", true)

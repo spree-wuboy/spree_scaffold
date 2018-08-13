@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.requirements << 'none'
 
   s.add_dependency 'spree_core'
-  s.add_dependency 'wkhtmltopdf-binary'
+  s.add_dependency 'wkhtmltopdf-binary', '0.12.3.1'
   s.add_dependency 'wicked_pdf', '1.0.6'
   s.add_dependency 'faker'
   s.add_dependency 'tinymce-rails'

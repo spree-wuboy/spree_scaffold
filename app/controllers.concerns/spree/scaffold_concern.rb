@@ -44,7 +44,7 @@ module Spree
           params[:q][:created_at_lt] = Time.zone.parse(params[:q][:created_at_lt]).end_of_day rescue ""
         end
         base_search = method(:collection).super_method.call
-        if params[:q][:checked] == "true"
+        if params[:checked] == "true"
           result = base_search.includes(override_includes || includes).ransack(params[:q].merge(:id_in => session[session_key]))
         elsif params[:checks]
           result = base_search.includes(override_includes || includes).ransack(params[:q].merge(:id_in => params[:checks].split(",")))
