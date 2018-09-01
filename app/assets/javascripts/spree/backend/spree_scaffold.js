@@ -164,7 +164,7 @@ $(document).ready(function () {
         var target = $(this).data("target");
         var new_table_row = $("#" + target + "-template").clone();
         var appender = $("#" + target + "-tbody");
-        new_table_row.show().find("input, select, textarea").prop("disabled", false);
+        new_table_row.show().attr("id", "").removeClass("nested-template").find("input, select, textarea").prop("disabled", false);
         var new_id = new Date().getTime() + (subFieldId++);
         new_table_row.find("input, select").each(function () {
             var el = $(this);
@@ -181,6 +181,14 @@ $(document).ready(function () {
         appender.append(new_table_row);
         new_table_row.find('.select2-picker').each(function() {
             $(this).select2Autocomplete($(this).data());
+        });
+
+        // hack for product picker
+        new_table_row.find('.product_picker').each(function() {
+            $(this).productAutocomplete();
+        });
+        new_table_row.find('.single_product_picker').each(function() {
+            $(this).productAutocomplete({multiple: false});
         });
     });
 
