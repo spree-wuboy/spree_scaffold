@@ -1,7 +1,7 @@
 <%% content_for :table_filter do -%>
     <fieldset>
       <legend><%%= Spree.t(:search) %></legend>
-      <%%= search_form_for [:admin, @search], :url => collection_url do |f| %>
+      <%%= search_form_for [:admin, @search], id: "#{@search.klass.model_name.singular}_search", :url => collection_url do |f| %>
       <div data-hook="admin_<%=singular_name%>_index_search" class="well">
         <div class="row no-marginb">
           <%- search_first = true -%>

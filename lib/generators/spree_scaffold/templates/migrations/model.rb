@@ -20,8 +20,8 @@ class CreateSpree<%= class_name.pluralize %> < ActiveRecord::Migration[5.0]
     end
 
 <% attributes.each do |attribute| -%>
-  <%- if attribute.name == "deleted_at" || options[:fk].values.include?(attribute.name) || options[:search].include?(attribute.name) -%>
-    <%- if attribute.type == "polymorphic" -%>
+  <%- if attribute.name == "deleted_at" || options[:fk].values.include?(attribute.name) || (options[:search].include?(attribute.name) && attribute.type != :text ) -%>
+    <%- if attribute.type == :polymorphic -%>
     add_index :spree_<%= table_name %>, [:<%=attribute.name%>_type, :<%=attribute.name%>_id] <%=options[:unique].include?(attribute.name) ? ", unique: true" : ""%>
     <%- else -%>
     add_index :spree_<%= table_name %>, :<%=attribute.name%> <%=options[:unique].include?(attribute.name) ? ", unique: true" : ""%>
