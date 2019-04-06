@@ -13,7 +13,11 @@ module Spree
           authorize! :create, Spree::<%=class_name%>
           @<%=singular_name%> = Spree::<%=class_name%>.new(map_nested_attributes_keys(Spree::<%=class_name%>, <%=singular_name%>_params))
           if @<%=singular_name%>.save
-            respond_with(@<%=singular_name%>, :status => 201, :default_template => :show)
+            respond_with(@<%=singular_name%>, :status => 201, :default_template => :show) do
+              format.html { render layout: !request.xhr? }
+              format.js   { render layout: false } if request.xhr?
+            end
+        end
           else
             invalid_resource!(@<%=singular_name%>)
           end
@@ -22,17 +26,27 @@ module Spree
         def destroy
           authorize! :destroy, @<%=singular_name%>
           @<%=singular_name%>.destroy
-          respond_with(@<%=singular_name%>, :status => 204)
+          respond_with(@<%=singular_name%>, :status => 204) do
+            format.html { render layout: !request.xhr? }
+            format.js   { render layout: false } if request.xhr?
+          end
+      end
         end
 
         def show
-          respond_with(@<%=singular_name%>)
+          respond_with(@<%=singular_name%>) do
+            format.html { render layout: !request.xhr? }
+            format.js   { render layout: false } if request.xhr?
+          end
         end
 
         def update
           authorize! :update, @<%=singular_name%>
           if @<%=singular_name%>.update_attributes(map_nested_attributes_keys(Spree::<%=class_name%>, <%=singular_name%>_params))
-            respond_with(@<%=singular_name%>, :status => 200, :default_template => :show)
+            respond_with(@<%=singular_name%>, :status => 200, :default_template => :show) do
+              format.html { render layout: !request.xhr? }
+              format.js   { render layout: false } if request.xhr?
+            end
           else
             invalid_resource!(@<%=singular_name%>)
           end

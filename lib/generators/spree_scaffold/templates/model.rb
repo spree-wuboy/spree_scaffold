@@ -22,7 +22,7 @@ module Spree
 <%- end -%>
 <%- if i18n? -%>
     if defined?(SpreeGlobalize)
-      translates <%= options[:i18n].map { |f| ":#{f}" }.join(', ') %>
+      translates <%= options[:i18n].map { |f| ":#{f}" }.join(', ') %>, :fallbacks_for_empty_translations => true
       include SpreeGlobalize::Translatable
     end
 <%- end -%>
