@@ -1,4 +1,4 @@
-<!--insert_before 'erb[loud]:contains("spree/backend/all")' -->
+<!--insert_before 'erb[loud]:contains("spree/shared/paths")' -->
 <script>
     var css_path = "<%=asset_path('spree/frontend/all.css')%>";
 </script>
