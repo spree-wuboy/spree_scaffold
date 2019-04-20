@@ -17,7 +17,6 @@ module Spree
               format.html { render layout: !request.xhr? }
               format.js   { render layout: false } if request.xhr?
             end
-        end
           else
             invalid_resource!(@<%=singular_name%>)
           end
@@ -30,7 +29,6 @@ module Spree
             format.html { render layout: !request.xhr? }
             format.js   { render layout: false } if request.xhr?
           end
-      end
         end
 
         def show

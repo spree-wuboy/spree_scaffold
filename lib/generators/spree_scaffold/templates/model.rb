@@ -47,6 +47,9 @@ module Spree
                       url: '/spree/<%= plural_name %>/:id/:basename.:extension',
                       path: ':rails_root/public/spree/<%= plural_name %>/:id/:basename.:extension'
     do_not_validate_attachment_file_type :<%= attribute.name %>
+    attr_accessor :delete_<%= attribute.name %>
+    before_validation { <%= attribute.name %>.clear if delete_<%= attribute.name %> == '1' }
+
 <%- elsif attribute.type == :polymorphic -%>
     # please add has_many or has_one relationship to parent model by yourselfs
     # has_many :images, -> { order(:position) }, as: :viewable, dependent: :destroy, class_name: "Spree::Image"

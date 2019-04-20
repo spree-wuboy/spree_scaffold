@@ -122,9 +122,16 @@ $.fn.select2Autocomplete = function (options) {
 
 $(document).ready(function () {
 
+    $(".file-reset").click(function() {
+        var input =$(this).parent().find("input[type=file]")[0] || $(this).parents('div').children("input[type=file]")[0];
+        input.value = ''
+        if(!/safari/i.test(navigator.userAgent)){
+            input.type = ''
+            input.type = 'file'
+        }
+    });
 
     tinymce.init({
-        content_css: css_path,
         language: 'en',
         selector: ".tinymce-div",
         plugins: "link advlist code autolink table lists colorpicker insertdatetime wordcount charmap autolink hr anchor pagebreak textcolor responsivefilemanager responsivefilemanager2 youtube localautosave preview mobilepreview",
@@ -150,7 +157,7 @@ $(document).ready(function () {
                 }
             });
         },
-        content_css: "<%=asset_path('spree/frontend/all.css')%>"
+        content_css: typeof css_path !== 'undefined' ? css_path : "<%=asset_path('spree/frontend/all.css')%>"
     });
 
 
