@@ -33,7 +33,12 @@
     attributes:
       spree/<%= singular_name %>:
 <% attributes.each do |attribute| -%>
+      <%- if attribute.type==:polymorphic -%>
+        <%= attribute.name %>_type: "<%= attribute.name.titleize %>_type"
+        <%= attribute.name %>_id: "<%= attribute.name.titleize %>_id"
+      <%- else -%>
         <%= attribute.name %>: "<%= attribute.name.titleize %><%=attribute.type == :boolean ? '?' : ''%>"
+      <%- end -%>
 <%- if options[:enum].keys.include?(attribute.name) -%>
         <%= attribute.name.pluralize %>:
 <% options[:enum][attribute.name].split(",").each do |enum| -%>
@@ -42,6 +47,6 @@
 <%- end -%>
 <% end -%>
         checked: "checked"
-<% options[:nested].each do |nested| -%>
+        <%- @nested_hash.keys.each do |nested| -%>
         <%=nested%>: '<%=nested%>'
-<% end -%>
+        <%- end -%>

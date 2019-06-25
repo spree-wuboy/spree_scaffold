@@ -62,10 +62,6 @@ module Spree
 
         private
 
-        def <%=singular_name%>_params
-          params.require(:<%=singular_name%>).permit!
-        end
-
         def model_class
         <%- if options[:model_class] -%>
           @model_class = <%=options[:model_class]%>

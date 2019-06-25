@@ -71,19 +71,25 @@ module Spree
 <%- if presence_not_boolean.any? -%>
     validates_presence_of <%= presence_not_boolean.map{|p| ":#{p}"}.join(", ") %>
 <%- end -%>
+<%- if presence_polymorphic.any? -%>
+    validates_presence_of <%= presence_polymorphic.map{|p| ":#{p}_type"}.join(", ") %>,<%= presence_polymorphic.map{|p| ":#{p}_id"}.join(", ") %>
+<%- end -%>
 <%- if presence_boolean.any? -%>
     validates <%= presence_boolean.map{|p| ":#{p}"}.join(", ") %>, :inclusion => { :in => [true, false] }
 <%- end -%>
 <%- if options[:unique].any? -%>
     validates_uniqueness_of <%= options[:unique].map{|p| ":#{p}"}.join(", ") %>
 <%- end -%>
-<%- options[:nested].each do |nested| -%>
+<%- @nested_hash.keys.each do |nested| -%>
+<%- if @poly_hash[nested]-%>
+    has_many :<%=nested%>, dependent: :destroy, as: :<%=@poly_hash[nested]%>
+<%- else -%>
     has_many :<%=nested%>, dependent: :destroy
 <%- end -%>
-<%- options[:nested].each do |nested| -%>
+<%- end -%>
+<%- @nested_hash.keys.each do |nested| -%>
     accepts_nested_attributes_for :<%=nested%>, allow_destroy: true
 <%- end -%>
-
 <%- if slugged? -%>
     def slug_candidates
       [:<%= attributes.find { |a| a.type == :string }.name %>]
@@ -91,18 +97,18 @@ module Spree
 <%- end -%>
 
     def self.csv_headers
-      headers = [<%=attributes.map{|attribute| "'#{attribute.name}'"}.join(',')%>]
+      headers = [<%=attributes.map{|attribute| attribute.type == :polymorphic ? "'#{attribute.name}_type','#{attribute.name}_id'" :" '#{attribute.name}'"}.join(',')%>]
       headers.map {|header| I18n.t("activerecord.attributes.spree/<%= singular_name %>.#{header}")}
     end
 
     def self.csv_columns(<%= singular_name %>)
-      [<%=attributes.map{|attribute| "#{singular_name}.#{attribute.name}"}.join(',')%>]
+      [<%=attributes.map{|attribute| attribute.type == :polymorphic ? "#{singular_name}.#{attribute.name}_type,#{singular_name}.#{attribute.name}_id" : "#{singular_name}.#{attribute.name}"}.join(',')%>]
     end
 
 <%- if options[:cache] -%>
     def self.cached
       Rails.cache.fetch("#{Rails.application.class.parent_name.underscore}_<%= class_name.underscore %>") do
-        <%=nested? ? "includes(#{options[:nested].map{|n| ":#{n}"}.join(",")}).all" : "all"%>
+        <%=nested? ? "includes(#{@nested_hash.keys.map{|n| ":#{n}"}.join(",")}).all" : "all"%>
       end
     end
 

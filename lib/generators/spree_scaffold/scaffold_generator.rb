@@ -39,6 +39,7 @@ module SpreeScaffold
 
       def create_model
         if !options[:gen] || options[:gen].include?("m")
+          create_nested
           if options[:model_class]
             template 'model.rb', "app/models/#{options[:model_class].gsub("::", "/").downcase}.rb"
           else
@@ -56,6 +57,7 @@ module SpreeScaffold
 
       def create_api_controller
         if !options[:gen] || options[:gen].include?("c")
+          create_nested
           template 'api_controller.rb', "app/controllers/spree/api/v1/#{plural_name}_controller.rb"
         end
       end
@@ -125,6 +127,7 @@ module SpreeScaffold
 
       def create_locale
         if !options[:gen]
+          create_nested
           current_locales = ["en"]
           locales = (options[:locale].keys + current_locales).uniq
           locales.each do |locale|
@@ -240,7 +243,11 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
       end
 
       def presence_not_boolean
-        options[:presence].select {|p| self.attributes_hash[p].type != :boolean}
+        options[:presence].select {|p| self.attributes_hash[p].type != :boolean && self.attributes_hash[p].type != :polymorphic}
+      end
+
+      def presence_polymorphic
+        options[:presence].select {|p| self.attributes_hash[p].type == :polymorphic}
       end
 
       def presence_boolean
@@ -262,16 +269,23 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
         log_path = "config/scaffold.conf"
         create_file log_path unless File.exist?(File.join(destination_root, log_path))
         @nested_hash = {}
+        @poly_hash = {}
         File.readlines(log_path).each do |line|
           options[:nested].each do |nested|
-            if line.include?("rails g spree:scaffold #{nested.singularize} ") || line.include?("rails g spree_scaffold:scaffold #{nested.singularize} ")
+            if nested.include?(":")
+              plural = nested.split(":")[0]
+              @poly_hash[plural] = nested.split(":")[1]
+            else
+              plural = nested
+            end
+            if line.include?("rails g spree:scaffold #{plural.singularize} ") || line.include?("rails g spree_scaffold:scaffold #{plural.singularize} ")
               line = line.gsub(/ [ ]*/, " ").gsub("\n", "")
               nested_options_map = line.sub(/.*? --/, "").split("--")
               nested_options = {}
               nested_options_map && nested_options_map.each do |op|
                 nested_options[op.split("=")[0].to_sym] = op.split("=")[1].sub(/ $/, "")
               end
-              @nested_hash[nested] = line.gsub("spree:scaffold", "spree_scaffold:scaffold").gsub("rails g spree_scaffold:scaffold #{nested.singularize}", "")
+              @nested_hash[plural] = line.gsub("spree:scaffold", "spree_scaffold:scaffold").gsub("rails g spree_scaffold:scaffold #{plural.singularize}", "")
                                          .gsub(/--.*/, "").split(" ").map {|s| {:name => s.split(":")[0], :type => s.split(":")[1].to_sym,
                                                                                 :presence => nested_options[:presence] && nested_options[:presence].split(" ") && nested_options[:presence].split(" ").include?(s.split(":")[0]),
                                                                                 :html => nested_options[:html] && nested_options[:html].split(" ") && nested_options[:html].split(" ").include?(s.split(":")[0]),

@@ -47,8 +47,8 @@
       <%- if options[:presence].include?(attribute.name) -%>
         <abbr style="color: red">*</abbr>
       <%- end -%>
-        <div>
-          <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%=attribute.name%>, 1, :checked => f.object.<%= attribute.name %> == true %>&nbsp;&nbsp;
+        <div class="form-control">
+          <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%=attribute.name%>, 1, :checked => f.object.<%= attribute.name %> == true %>&nbsp;&nbsp;&nbsp;
           <%%=Spree.t("scaffold.say_no")%>: <%%= f.radio_button :<%=attribute.name%>, 0, :checked => f.object.<%= attribute.name %> == false %>&nbsp;&nbsp;
         </div>
   <%- elsif attribute.type == :datetime -%>
@@ -64,11 +64,16 @@
       <%- end -%>
         <%%= f.number_field :<%= attribute.name %>,  class: 'form-control', step: 1 %>
   <%- elsif attribute.type == :polymorphic -%>
-        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
+        <%%= f.label :<%= attribute.name %>_type, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>_type") %>
       <%- if options[:presence].include?(attribute.name) -%>
         <abbr style="color: red">*</abbr>
       <%- end -%>
-        <%%= f.select :<%= attribute.name %>_id, options_for_select(@select_<%=attribute.name%>_id.map { |s| [s.id, s.id] }, f.object.<%=attribute.name%>_id), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
+        <%%= f.select :<%= attribute.name %>_type, options_for_select(@select_<%=attribute.name%>_type.map { |s| [s.id, s.id] }, f.object.<%=attribute.name%>_type), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
+        <%%= f.label :<%= attribute.name %>_id, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>_id") %>
+      <%- if options[:presence].include?(attribute.name) -%>
+        <abbr style="color: red">*</abbr>
+      <%- end -%>
+        <%%= f.number_field :<%= attribute.name %>_id,  class: 'form-control', step: '1' %>
   <%- elsif attribute.type == :text  -%>
         <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
       <%- if options[:presence].include?(attribute.name) -%>
@@ -96,7 +101,7 @@
 </div>
 
 
-<%- options[:nested].each do |nested| -%>
+<%- @nested_hash.keys.each do |nested| -%>
 <div data-hook="admin_<%= singular_name %>_<%=nested%>_form_fields">
   <%%= f.label :<%= nested %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=nested%>") %>
   <span id="new_add_<%=nested.singularize%>">
@@ -110,7 +115,8 @@
         <th class="no-border"></th>
       <%- end -%>
   <%- @nested_hash[nested].each do |hash| -%>
-    <%- if hash[:name]  != 'position' && hash[:name]  != "#{singular_name}_id" -%>
+    <%- if hash[:type] == :polymorphic -%>
+    <%- elsif hash[:name]  != 'position' && hash[:name]  != "#{singular_name}_id" -%>
         <th>
           <%%= label_tag I18n.t(:<%=hash[:name] %>, :scope => 'activerecord.attributes.spree/<%=nested.singularize%>') %><%=hash[:presence] ? '<abbr style="color: red">*</abbr>' : ''%>
         </th>
@@ -161,6 +167,7 @@
         <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.text_area :<%= hash[:name] %>,  class: 'form-control <%=hash[:html] ? 'tinymce-div' : ''%>' %></td>
     <%- elsif hash[:type] == :float -%>
         <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control' %></td>
+    <%- elsif hash[:type] == :polymorphic -%>
     <%- else -%>
         <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.text_field :<%= hash[:name] %>,  class: 'form-control' %></td>
     <%- end -%>

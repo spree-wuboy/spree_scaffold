@@ -24,17 +24,23 @@ module Spree
       end
     <%- end -%>
 
+      protected
+
+      def permitted_resource_params
+        params[resource.object_name].present? ? params.require(resource.object_name).permit! : ActionController::Parameters.new
+      end
+
       private
 
       def add_edit_fk
 <% attributes.each do |attribute| -%>
 <% if options[:fk].values.include?(attribute.name) -%>
 <% fk_class_name = "Spree::#{options[:fk].invert[attribute.name].camelcase}" -%>
-        if defined?(<%=fk_class_name%>)
-          @select_<%=attribute.name%> = <%=fk_class_name%>.all
-        end
+      if defined?(<%=fk_class_name%>)
+        @select_<%=attribute.name%> = <%=fk_class_name%>.all
+      end
 <% elsif attribute.type == :polymorphic -%>
-          @select_<%=attribute.name%>_id = @object.present? && @object.<%=attribute.name%>_type.present? ? @object.<%=attribute.name%>_type.constantize.all : []
+        @select_<%=attribute.name%>_type = model_class.select(:<%=attribute.name%>_type).distinct
 <% end -%>
 <% end -%>
       end
@@ -54,7 +60,7 @@ module Spree
 
       def add_nested_build
         if @object
-      <%- options[:nested].each do |nested| -%>
+      <%- @nested_hash.keys.each do |nested| -%>
           @object.<%=nested%>.build
       <%- end -%>
         end

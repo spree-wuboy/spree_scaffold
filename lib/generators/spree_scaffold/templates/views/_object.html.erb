@@ -40,27 +40,28 @@
       </div>
     </div>
   </div>
-  <%- options[:nested].each do |nested| -%>
+  <%- @nested_hash.keys.each do |nested| -%>
   <div data-hook="admin_<%= singular_name %>_<%=nested%>_form_fields">
     <%%= label_tag :<%= nested %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=nested%>") %>
     <table class="index table-condensed table-bordered sortable table" data-sortable-link="<%%= <%= "update_positions_admin_#{nested}_url" %> %>">
       <thead data-hook="<%=nested.singularize%>_header">
         <tr>
-<%- if @nested_hash[nested].present? -%>
-  <%- @nested_hash[nested].map{|h| h[:name]}.each do |name| -%>
-      <%- if name != 'position' && name != "#{singular_name}_id" -%>
-          <th><%%= label_tag I18n.t(:<%=name%>, :scope => 'activerecord.attributes.spree/<%=nested.singularize%>') %></th>
+      <%- @nested_hash[nested].each do |h| -%>
+        <%- if h[:type] == :polymorphic -%>
+          <th><%%= label_tag I18n.t(:<%=h[:name]%>_id, :scope => 'activerecord.attributes.spree/<%=nested.singularize%>') %></th>
+        <%- elsif h[:name] != 'position' && h[:name] != "#{singular_name}_id" -%>
+          <th><%%= label_tag I18n.t(:<%=h[:name]%>, :scope => 'activerecord.attributes.spree/<%=nested.singularize%>') %></th>
+        <%- end -%>
       <%- end -%>
-  <%- end -%>
-<%- end -%>
         </tr>
       </thead>
       <tbody id="<%=nested%>-tbody">
       <%% object.<%=nested%>.each do |<%=nested.singularize%>| %>
         <tr id="<%%=spree_dom_id(<%=nested.singularize%>)%>" class="<%%= cycle('odd', 'even') %>">
-  <%- if @nested_hash[nested].present? -%>
   <%- @nested_hash[nested].each do |hash| -%>
-    <%- if hash[:name] == "#{singular_name}_id" || hash[:name] == 'position' -%>
+    <%- if hash[:type] == :polymorphic -%>
+        <td data-hook="col-<%= hash[:name] %>_id"><%%= <%=nested.singularize%>.<%=hash[:name]%>_id %></td>
+    <%- elsif hash[:name] == "#{singular_name}_id" || hash[:name] == 'position' -%>
     <%- elsif hash[:type] == :image || hash[:type] == :file -%>
         <td data-hook="col-<%= hash[:name] %>">
       <%- if hash[:type] == :image -%>
@@ -84,7 +85,6 @@
         <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested.singularize%>.<%=hash[:name] %> %></td>
     <%- end -%>
   <%- end -%>
-<%- end %>
         </tr>
       <%% end %>
       </tbody>
