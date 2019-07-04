@@ -41,9 +41,9 @@ module SpreeScaffold
         if !options[:gen] || options[:gen].include?("m")
           create_nested
           if options[:model_class]
-            template 'model.rb', "app/models/#{options[:model_class].gsub("::", "/").downcase}.rb"
+            template 'model.rb', "app/models/#{options[:model_class].gsub("::", "/").downcase}.rb" unless File.exist?("app/models/#{options[:model_class].gsub("::", "/").downcase}.rb")
           else
-            template 'model.rb', "app/models/spree/#{singular_name}.rb"
+            template 'model.rb', "app/models/spree/#{singular_name}.rb" unless File.exist?("app/models/spree/#{singular_name}.rb")
           end
         end
       end
@@ -51,14 +51,16 @@ module SpreeScaffold
       def create_controller
         if !options[:gen] || options[:gen].include?("c")
           create_nested
-          template 'controller.rb', "app/controllers/spree/admin/#{plural_name}_controller.rb"
+          template 'core_controller.rb', "app/controllers/spree/admin/core/#{plural_name}_controller.rb"
+          template 'controller.rb', "app/controllers/spree/admin/#{plural_name}_controller.rb" unless File.exist?("app/controllers/spree/admin/#{plural_name}_controller.rb")
         end
       end
 
       def create_api_controller
         if !options[:gen] || options[:gen].include?("c")
           create_nested
-          template 'api_controller.rb', "app/controllers/spree/api/v1/#{plural_name}_controller.rb"
+          template 'api_core_controller.rb', "app/controllers/spree/api/core/v1/#{plural_name}_controller.rb"
+          template 'api_controller.rb', "app/controllers/spree/api/v1/#{plural_name}_controller.rb" unless File.exist?("app/controllers/spree/api/v1/#{plural_name}_controller.rb")
         end
       end
 

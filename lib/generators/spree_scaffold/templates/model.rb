@@ -71,9 +71,6 @@ module Spree
 <%- if presence_not_boolean.any? -%>
     validates_presence_of <%= presence_not_boolean.map{|p| ":#{p}"}.join(", ") %>
 <%- end -%>
-<%- if presence_polymorphic.any? -%>
-    validates_presence_of <%= presence_polymorphic.map{|p| ":#{p}_type"}.join(", ") %>,<%= presence_polymorphic.map{|p| ":#{p}_id"}.join(", ") %>
-<%- end -%>
 <%- if presence_boolean.any? -%>
     validates <%= presence_boolean.map{|p| ":#{p}"}.join(", ") %>, :inclusion => { :in => [true, false] }
 <%- end -%>
