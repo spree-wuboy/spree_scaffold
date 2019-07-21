@@ -85,7 +85,7 @@ $.fn.select2Autocomplete = function (options) {
     }
 
     this.select2({
-        minimumInputLength: options["minimum-input-length"] || 3,
+        minimumInputLength: options["minimum"]!=='' && options["minimum"]!==undefined ? options["minimum"] : 3,
         multiple: multiple,
         initSelection: function (element, callback) {
             $.get(options.url, {

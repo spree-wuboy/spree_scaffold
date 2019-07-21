@@ -23,6 +23,7 @@ module SpreeScaffold
       class_option :model_class, type: :string, required: false, desc: 'different model class than Spree::Model'
       class_option :updated_by, type: :boolean, default: false, required: false, desc: 'add created_by_id and updated_by_id'
       class_option :full_width, type: :boolean, default: false, required: false, desc: 'full width form'
+      class_option :select2_minimum, type: :string, default: 3, required: false, desc: 'select2 default minimum length for fk'
       class_option :gen, type: :string, required: false, desc: 'generate type, default is false, you can use v(view), m(migration+model), c(controller), o(override). e.g. vm will generate view, model, and migration'
 
       def self.next_migration_number(path)
@@ -41,9 +42,9 @@ module SpreeScaffold
         if !options[:gen] || options[:gen].include?("m")
           create_nested
           if options[:model_class]
-            template 'model.rb', "app/models/#{options[:model_class].gsub("::", "/").downcase}.rb" unless File.exist?("app/models/#{options[:model_class].gsub("::", "/").downcase}.rb")
+            template 'model.rb', "app/models/#{options[:model_class].gsub("::", "/").downcase}.rb" # unless File.exist?("app/models/#{options[:model_class].gsub("::", "/").downcase}.rb")
           else
-            template 'model.rb', "app/models/spree/#{singular_name}.rb" unless File.exist?("app/models/spree/#{singular_name}.rb")
+            template 'model.rb', "app/models/spree/#{singular_name}.rb" # unless File.exist?("app/models/spree/#{singular_name}.rb")
           end
         end
       end
@@ -200,7 +201,7 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
       def model_modules
         classes = options[:model_class].split("::")
         if classes.size > 1
-          classes[0..(classes.size-2)]
+          classes[0..(classes.size - 2)]
         else
           []
         end
@@ -209,7 +210,7 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
       def module_class
         classes = options[:model_class].split("::")
         if classes.size > 1
-          classes[classes.size-1]
+          classes[classes.size - 1]
         else
           options[:model_class]
         end
@@ -241,7 +242,7 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
       end
 
       def string_index_columns
-        self.attributes.select {|a| a.type == :string && options[:search].include?(a.name)}.map{|a| a.name}
+        self.attributes.select {|a| a.type == :string && options[:search].include?(a.name)}.map {|a| a.name}
       end
 
       def presence_not_boolean
@@ -276,7 +277,10 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
           options[:nested].each do |nested|
             if nested.include?(":")
               plural = nested.split(":")[0]
-              @poly_hash[plural] = nested.split(":")[1]
+              cls = nested.split(":")[1]
+              if plural.singularize != cls
+                @poly_hash[plural] = nested.split(":")[1]
+              end
             else
               plural = nested
             end
@@ -290,8 +294,11 @@ gem 'spree_globalize', github: 'spree-wuboy/spree_globalize', branch: 'master'}
               @nested_hash[plural] = line.gsub("spree:scaffold", "spree_scaffold:scaffold").gsub("rails g spree_scaffold:scaffold #{plural.singularize}", "")
                                          .gsub(/--.*/, "").split(" ").map {|s| {:name => s.split(":")[0], :type => s.split(":")[1].to_sym,
                                                                                 :presence => nested_options[:presence] && nested_options[:presence].split(" ") && nested_options[:presence].split(" ").include?(s.split(":")[0]),
-                                                                                :html => nested_options[:html] && nested_options[:html].split(" ") && nested_options[:html].split(" ").include?(s.split(":")[0]),
-                                                                                :enum => nested_options[:enum] && nested_options[:enum].split(" ") && nested_options[:enum].split(" ").map{|o| o.split(":")[0]}.include?(s.split(":")[0])}}
+                                                                                :html => nested_options[:html] && nested_options[:html].split(" ").include?(s.split(":")[0]),
+                                                                                :fk => nested_options[:fk] && nested_options[:fk].split(" ").select{|fk| puts("1=#{fk.split(":")[1]}, 2=#{s.split(":")[0]}"); fk.split(":")[1] == s.split(":")[0]}[0] ? nested_options[:fk].split(" ").select{|fk| fk.split(":")[1] == s.split(":")[0]}[0].split(":")[0] : nil,
+                                                                                :select2_minimum => nested_options[:select2_minimum],
+                                                                                :enum => nested_options[:enum] && nested_options[:enum].split(" ").map {|o| o.split(":")[0]}.include?(s.split(":")[0])}}
+
             end
           end
         end

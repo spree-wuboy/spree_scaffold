@@ -13,6 +13,7 @@
         <%- end -%>
           <%%= f.hidden_field :<%= attribute.name %>, :class => "select2-picker",
             "data-multiple"=> false,
+            "data-minimum" => <%=options[:select2_minimum] ? options[:select2_minimum] : 3 %>,
             "data-url" => api_v1_<%=options[:fk].invert[attribute.name].pluralize%>_path,
             "data-name" => <%=fk_class_name%>.column_names.include?("name") ? "name" : "id",
             "data-query" => <%=fk_class_name%>.column_names.include?("name") ? "name_cont" : "id_eq",
@@ -141,6 +142,17 @@
     <%- if hash[:name] == "#{singular_name}_id" || hash[:name] == 'position' -%>
     <%- elsif hash[:enum] -%>
         <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.select :<%= hash[:name] %>, options_for_select(Spree::<%=nested.singularize.camelcase%>.<%=hash[:name].pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=nested.singularize%>.<%=hash[:name].pluralize%>.#{k}"), k]}, <%=nested%>_form.object.<%=hash[:name]%>), {<%=options[:presence].include?(hash[:name]) ? "" : "include_blank: true"%>}, {class: 'form-control'} %></td>
+    <%- elsif hash[:fk] %>
+        <%- fk_class_name = "Spree::#{hash[:fk].camelcase}" -%>
+        <td data-hook="col-<%= hash[:name] %>">
+          <%%= <%=nested%>_form.hidden_field :<%= hash[:name]  %>, :class => "select2-picker",
+          "data-multiple"=> false,
+          "data-minimum" => <%=options[:select2_minimum] ? options[:select2_minimum] : 3 %>,
+          "data-url" => api_v1_<%= hash[:fk].underscore.pluralize%>_path,
+          "data-name" => <%=fk_class_name%>.column_names.include?("name") ? "name" : "id",
+          "data-query" => <%=fk_class_name%>.column_names.include?("name") ? "name_cont" : "id_eq",
+          "data-objects" => "<%=hash[:fk].underscore.pluralize.pluralize%>"%>
+        </td>
     <%- elsif hash[:type] == :image || hash[:type] == :file -%>
         <td data-hook="col-<%= hash[:name] %>">
           <%- if hash[:type] == :image -%>

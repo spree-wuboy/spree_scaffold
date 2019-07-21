@@ -31,19 +31,17 @@ module Spree
           params[resource.object_name].present? ? params.require(resource.object_name).permit! : ActionController::Parameters.new
         end
 
-        private
-
         def add_edit_fk
-  <% attributes.each do |attribute| -%>
-  <% if options[:fk].values.include?(attribute.name) -%>
-  <% fk_class_name = "Spree::#{options[:fk].invert[attribute.name].camelcase}" -%>
-        if defined?(<%=fk_class_name%>)
-          @select_<%=attribute.name%> = <%=fk_class_name%>.all
-        end
-  <% elsif attribute.type == :polymorphic -%>
-          @select_<%=attribute.name%>_type = model_class.select(:<%=attribute.name%>_type).distinct
-  <% end -%>
-  <% end -%>
+    <%- attributes.each do |attribute| -%>
+    <%- if options[:fk].values.include?(attribute.name) -%>
+    <%- fk_class_name = "Spree::#{options[:fk].invert[attribute.name].camelcase}" -%>
+          if defined?(<%=fk_class_name%>)
+            @select_<%=attribute.name%> = <%=fk_class_name%>.all
+          end
+    <%- elsif attribute.type == :polymorphic -%>
+            @select_<%=attribute.name%>_type = model_class.select(:<%=attribute.name%>_type).distinct
+    <%- end -%>
+    <%- end -%>
         end
 
         def add_search_fk
