@@ -46,7 +46,6 @@
 <% end -%>
 <%- end -%>
 <% end -%>
-        checked: "checked"
         <%- @nested_hash.keys.each do |nested| -%>
         <%=nested%>: '<%=nested%>'
         <%- end -%>

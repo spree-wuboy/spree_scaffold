@@ -4,7 +4,8 @@ en:
     scaffold:
       new: new
       edit: edit
-      list: ' list'
+      list: list
+      delete: delete
       include_all_or_check: "include all row or only checked row (yes: include all, cancel: only checked)"
       include_all_or_check_count: "include all row or only checked row (yes: include all %{all_count}, cancel: only checked %{check_count})"
       none: none
@@ -14,7 +15,6 @@ en:
       say_true: yes
       say_false: no
       print: "Print"
-      list: "List"
       list_pdf: "List(PDF)"
       batch: "Batch"
       export: "Export"

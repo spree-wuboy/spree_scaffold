@@ -5,6 +5,7 @@ zh-TW:
       new: 新增
       edit: 編輯
       list: 列表
+      delete: 刪除
       include_all_or_check: "包含全部搜尋結果或僅含勾選的資料 (確定: 全部, 取消: 僅勾選)"
       include_all_or_check_count: "包含全部搜尋結果或僅含勾選的資料 (確定: 全部%{all_count}筆, 取消: 僅勾選%{check_count}筆)"
       none: 無
@@ -14,7 +15,6 @@ zh-TW:
       say_true: 是
       say_false: 否
       print: 列印
-      list: "列表"
       list_pdf: "列表(PDF)"
       batch: 批次列印
       export: 匯出
