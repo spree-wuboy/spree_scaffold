@@ -2,7 +2,9 @@
 *= require tinymce/dropzone
 *= require tinymce/insert
  */
-
+.ui-datepicker-div {
+    z-index: 99
+}
 .scaffold-tooltip {
     position: relative;
     display: inline-block;
