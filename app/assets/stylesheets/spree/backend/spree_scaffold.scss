@@ -2,8 +2,8 @@
 *= require tinymce/dropzone
 *= require tinymce/insert
  */
-.ui-datepicker-div {
-    z-index: 99
+#ui-datepicker-div {
+    z-index: 99!important;
 }
 .scaffold-tooltip {
     position: relative;
