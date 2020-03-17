@@ -9,7 +9,7 @@ module Spree
 
     has_attached_file :attachment,
                       styles: { mini: '48x48>', small: '200x200>' , large: '1000x1000>'},
-                      default_style: :large,
+                      default_style: :original,
                       url: '/spree/images/:id/:style/:basename.:extension',
                       path: ':rails_root/public/spree/images/:id/:style/:basename.:extension',
                       use_timestamp: false,
@@ -61,7 +61,7 @@ module Spree
       {
           "name" => read_attribute(:attachment_file_name),
           "size" => read_attribute(:attachment_file_size),
-          "url" => attachment.url(:large),
+          "url" => attachment.url(:original),
           "small_url" => attachment.url(:small),
           "mini_url" => attachment.url(:mini)
       }
