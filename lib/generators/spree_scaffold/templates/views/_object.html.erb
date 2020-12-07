@@ -26,7 +26,7 @@
             <%- elsif attribute.type == :file -%>
                 <%% if object.<%= attribute.name %>_file_name %>
                 <div><%%= link_to Spree.t(:download_file), object.<%= attribute.name %>.url, target: '_blank' %></div>
-                `<%% end %>
+                <%% end %>
             <%- end -%>
         <%- elsif attribute.type == :datetime -%>
             <%%= label_tag :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
