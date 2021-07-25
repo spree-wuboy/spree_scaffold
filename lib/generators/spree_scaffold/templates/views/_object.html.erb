@@ -37,6 +37,14 @@
         <%- end -%>
         <%% end %>
     <%- end -%>
+        <%%= content_tag :div, class: ['form-group'] do %>
+          <%%= label_tag :created_at, Spree.t(:created_at) %>
+          <%%= content_tag(:div, pretty_time(object.created_at)) if object.created_at.present? %>
+        <%% end %>
+        <%%= content_tag :div, class: ['form-group'] do %>
+        <%%= label_tag :updated_at, Spree.t(:updated_at) %>
+        <%%= content_tag(:div, pretty_time(object.updated_at)) if object.updated_at.present? %>
+        <%% end %>
       </div>
     </div>
   </div>

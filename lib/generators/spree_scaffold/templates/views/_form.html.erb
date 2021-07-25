@@ -1,197 +1,241 @@
 <div data-hook="admin_<%= singular_name %>_form_fields">
-<%- attributes.each do |attribute| -%>
-<%- next if (attribute.name == 'position' && attribute.type == :integer) || attribute.name == 'slug' || attribute.name == 'deleted_at' -%>
-  <div  class="row">
-    <div class="<%=options[:full_width] ? 'col-md-12' : 'col-md-6'%>" data-hook="col-<%= attribute.name %>">
-      <%%= f.field_container :<%= attribute.name %>, class: ['form-group'] do %>
-  <%- if options[:fk].values.include?(attribute.name) -%>
-      <%- fk_class_name = "Spree::#{options[:fk].invert[attribute.name].camelcase}" -%>
-        <%% if defined?(<%=fk_class_name%>) %>
-          <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-        <%- if options[:presence].include?(attribute.name) -%>
-          <abbr style="color: red">*</abbr>
-        <%- end -%>
+  <%- attributes.each do |attribute| -%>
+    <%- next if (attribute.name == 'position' && attribute.type == :integer) || attribute.name == 'slug' || attribute.name == 'deleted_at' -%>
+    <div class="row">
+      <div class="<%= options[:full_width] ? 'col-md-12' : 'col-md-6' %>" data-hook="col-<%= attribute.name %>">
+        <%%= f.field_container :<%= attribute.name %>, class: ['form-group'] do %>
+        <%- if options[:fk].values.include?(attribute.name) -%>
+          <%- fk_class_name = "Spree::#{options[:fk].invert[attribute.name].camelcase}" -%>
+          <%% if defined?(<%= fk_class_name %>) %>
+          <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%= singular_name %>.<%= attribute.name %>") %>
+          <%- if options[:presence].include?(attribute.name) -%>
+            <abbr style="color: red">*</abbr>
+          <%- end -%>
           <%%= f.hidden_field :<%= attribute.name %>, :class => "select2-picker",
-            "data-multiple"=> false,
-            "data-minimum" => <%=options[:select2_minimum] ? options[:select2_minimum] : 3 %>,
-            "data-url" => api_v1_<%=options[:fk].invert[attribute.name].pluralize%>_path,
-            "data-name" => <%=fk_class_name%>.column_names.include?("name") ? "name" : "id",
-            "data-query" => <%=fk_class_name%>.column_names.include?("name") ? "name_cont" : "id_eq",
-            "data-objects" => "<%=options[:fk].invert[attribute.name].pluralize%>"%>
-        <%% end %>
-  <%- elsif options[:enum].keys.include?(attribute.name) -%>
-        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%- if options[:presence].include?(attribute.name) -%>
-        <abbr style="color: red">*</abbr>
-      <%- end -%>
-        <%%= f.select :<%= attribute.name %>, options_for_select(Spree::<%=class_name%>.<%=attribute.name.pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name.pluralize%>.#{k}"), k]}, f.object.<%=attribute.name%>), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
-  <%- elsif attribute.type == :image || attribute.type == :file -%>
-        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%- if options[:presence].include?(attribute.name) %>
-        <abbr style="color: red">*</abbr>
-      <%- end %>
-        <%- if attribute.type == :image -%>
-      <%% if f.object.<%= attribute.name %>_file_name %>
-        <div><%%= image_tag f.object.<%= attribute.name %>.url(:small) -%></div>
-      <%% end %>
-      <%- elsif attribute.type == :file -%>
-        <%% if f.object.<%= attribute.name %>_file_name %>
-          <div><%%= link_to Spree.t(:download_file), f.object.<%= attribute.name %>.url, target: '_blank' %>&nbsp; DELETE: <%%=f.check_box(:delete_<%= attribute.name %>) %></div>
-        <%% end %>
-      <%- end -%>
-        <div class="input-group">
-          <%%= f.file_field :<%= attribute.name %>, class: 'form-control' %>
-          <span class="input-group-btn"><button type="button" class="btn btn-warning file-reset">RESET</button></span>
-        </div>
-  <%- elsif attribute.type == :boolean -%>
-        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%- if options[:presence].include?(attribute.name) -%>
-        <abbr style="color: red">*</abbr>
-      <%- end -%>
-        <div class="form-control">
-          <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%=attribute.name%>, 1, :checked => f.object.<%= attribute.name %> == true %>&nbsp;&nbsp;&nbsp;
-          <%%=Spree.t("scaffold.say_no")%>: <%%= f.radio_button :<%=attribute.name%>, 0, :checked => f.object.<%= attribute.name %> == false %>&nbsp;&nbsp;
-        </div>
-  <%- elsif attribute.type == :datetime -%>
-        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%- if options[:presence].include?(attribute.name) -%>
-        <abbr style="color: red">*</abbr>
-      <%- end -%>
-        <%%= f.text_field :<%= attribute.name %>, value: datepicker_field_value(f.object.<%= attribute.name %>), class: 'datepicker form-control' %>
-  <%- elsif attribute.type == :integer  -%>
-        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%- if options[:presence].include?(attribute.name) -%>
-        <abbr style="color: red">*</abbr>
-      <%- end -%>
-        <%%= f.number_field :<%= attribute.name %>,  class: 'form-control', step: 1 %>
-  <%- elsif attribute.type == :polymorphic -%>
-        <%%= f.label :<%= attribute.name %>_type, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>_type") %>
-      <%- if options[:presence].include?(attribute.name) -%>
-        <abbr style="color: red">*</abbr>
-      <%- end -%>
-        <%%= f.select :<%= attribute.name %>_type, options_for_select(@select_<%=attribute.name%>_type.map { |s| [s.id, s.id] }, f.object.<%=attribute.name%>_type), {<%=options[:presence].include?(attribute.name) ? "" : "include_blank: true"%>}, {class: 'form-control'} %>
-        <%%= f.label :<%= attribute.name %>_id, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>_id") %>
-      <%- if options[:presence].include?(attribute.name) -%>
-        <abbr style="color: red">*</abbr>
-      <%- end -%>
-        <%%= f.number_field :<%= attribute.name %>_id,  class: 'form-control', step: '1' %>
-  <%- elsif attribute.type == :text  -%>
-        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%- if options[:presence].include?(attribute.name) -%>
-        <abbr style="color: red">*</abbr>
-      <%- end -%>
-        <%%= f.text_area :<%= attribute.name %>,  class: 'form-control <%=options[:html].include?(attribute.name) ? 'tinymce-div' : ''%>' %>
-  <%- elsif attribute.type == :float  -%>
-        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%- if options[:presence].include?(attribute.name) -%>
-        <abbr style="color: red">*</abbr>
-      <%- end -%>
-        <%%= f.number_field :<%= attribute.name %>,  class: 'form-control', step: '0.01' %>
-  <%- else -%>
-        <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=attribute.name%>") %>
-      <%- if options[:presence].include?(attribute.name) -%>
-        <abbr style="color: red">*</abbr>
-      <%- end -%>
-        <%%= f.text_field :<%= attribute.name %>,  class: 'form-control' %>
-  <%- end -%>
+          "data-multiple"=> false,
+          "data-minimum" => <%= options[:select2_minimum] ? options[:select2_minimum] : 3 %>,
+          "data-url" => api_v1_<%= options[:fk].invert[attribute.name].pluralize %>_path,
+          "data-name" => <%= fk_class_name %>.column_names.include?("name") ? "name" : "id",
+          "data-query" => <%= fk_class_name %>.column_names.include?("name") ? "name_cont" : "id_eq",
+          "data-objects" => "<%= options[:fk].invert[attribute.name].pluralize %>"%>
+          <%% end %>
+        <%- elsif options[:enum].keys.include?(attribute.name) -%>
+          <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%= singular_name %>.<%= attribute.name %>") %>
+          <%- if options[:presence].include?(attribute.name) -%>
+            <abbr style="color: red">*</abbr>
+          <%- end -%>
+          <%%= f.select :<%= attribute.name %>, options_for_select(Spree::<%= class_name %>.<%= attribute.name.pluralize %>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%= singular_name %>.<%= attribute.name.pluralize %>.#{k}"), k]}, f.object.<%= attribute.name %>),
+          {<%= options[:presence].include?(attribute.name) ? "" : "include_blank: true" %>}, {class: 'form-control'} %>
+        <%- elsif attribute.type == :image || attribute.type == :file -%>
+          <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%= singular_name %>.<%= attribute.name %>") %>
+          <%- if options[:presence].include?(attribute.name) %>
+            <abbr style="color: red">*</abbr>
+          <%- end %>
+          <%- if attribute.type == :image -%>
+            <%% if f.object.<%= attribute.name %>_file_name %>
+            <div><%%= image_tag f.object.<%= attribute.name %>.url(:small) -%></div>
+            <%% end %>
+          <%- elsif attribute.type == :file -%>
+            <%% if f.object.<%= attribute.name %>_file_name %>
+            <div><%%= link_to Spree.t(:download_file), f.object.<%= attribute.name %>.url, target: '_blank' %>&nbsp;
+              DELETE: <%%=f.check_box(:delete_<%= attribute.name %>) %>
+            </div>
+            <%% end %>
+          <%- end -%>
+          <div class="input-group">
+            <%%= f.file_field :<%= attribute.name %>, class: 'form-control' %>
+            <span class="input-group-btn"><button type="button" class="btn btn-warning file-reset">RESET</button></span>
+          </div>
+        <%- elsif attribute.type == :boolean -%>
+          <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%= singular_name %>.<%= attribute.name %>") %>
+          <%- if options[:presence].include?(attribute.name) -%>
+            <abbr style="color: red">*</abbr>
+          <%- end -%>
+          <div class="form-control">
+            <%%=Spree.t("scaffold.say_yes")%>: <%%= f.radio_button :<%= attribute.name %>, 1, :checked =>
+            f.object.<%= attribute.name %> == true %>&nbsp;&nbsp;&nbsp;
+            <%%=Spree.t("scaffold.say_no")%>: <%%= f.radio_button :<%= attribute.name %>, 0, :checked =>
+            f.object.<%= attribute.name %> == false %>&nbsp;&nbsp;
+          </div>
+        <%- elsif attribute.type == :datetime -%>
+          <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%= singular_name %>.<%= attribute.name %>") %>
+          <%- if options[:presence].include?(attribute.name) -%>
+            <abbr style="color: red">*</abbr>
+          <%- end -%>
+          <%%= f.text_field :<%= attribute.name %>, value: datepicker_field_value(f.object.<%= attribute.name %>),
+          class: 'datepicker form-control' %>
+        <%- elsif attribute.type == :integer -%>
+          <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%= singular_name %>.<%= attribute.name %>") %>
+          <%- if options[:presence].include?(attribute.name) -%>
+            <abbr style="color: red">*</abbr>
+          <%- end -%>
+          <%%= f.number_field :<%= attribute.name %>, class: 'form-control', step: 1 %>
+        <%- elsif attribute.type == :polymorphic -%>
+          <%%= f.label :<%= attribute.name %>_type, I18n.t("activerecord.attributes.spree/<%= singular_name %>.<%= attribute.name %>_type") %>
+          <%- if options[:presence].include?(attribute.name) -%>
+            <abbr style="color: red">*</abbr>
+          <%- end -%>
+          <%%= f.select :<%= attribute.name %>_type, options_for_select(@select_<%= attribute.name %>_type.map { |s|
+          [s.id, s.id] }, f.object.<%= attribute.name %>_type),
+          {<%= options[:presence].include?(attribute.name) ? "" : "include_blank: true" %>}, {class: 'form-control'} %>
+          <%%= f.label :<%= attribute.name %>_id, I18n.t("activerecord.attributes.spree/<%= singular_name %>.<%= attribute.name %>_id") %>
+          <%- if options[:presence].include?(attribute.name) -%>
+            <abbr style="color: red">*</abbr>
+          <%- end -%>
+          <%%= f.number_field :<%= attribute.name %>_id, class: 'form-control', step: '1' %>
+        <%- elsif attribute.type == :text -%>
+          <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%= singular_name %>.<%= attribute.name %>") %>
+          <%- if options[:presence].include?(attribute.name) -%>
+            <abbr style="color: red">*</abbr>
+          <%- end -%>
+          <%%= f.text_area :<%= attribute.name %>, class:
+          'form-control <%= options[:html].include?(attribute.name) ? 'tinymce-div' : '' %>' %>
+        <%- elsif attribute.type == :float -%>
+          <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%= singular_name %>.<%= attribute.name %>") %>
+          <%- if options[:presence].include?(attribute.name) -%>
+            <abbr style="color: red">*</abbr>
+          <%- end -%>
+          <%%= f.number_field :<%= attribute.name %>, class: 'form-control', step: '0.01' %>
+        <%- else -%>
+          <%%= f.label :<%= attribute.name %>, I18n.t("activerecord.attributes.spree/<%= singular_name %>.<%= attribute.name %>") %>
+          <%- if options[:presence].include?(attribute.name) -%>
+            <abbr style="color: red">*</abbr>
+          <%- end -%>
+          <%%= f.text_field :<%= attribute.name %>, class: 'form-control' %>
+        <%- end -%>
         <%%= error_message_on :<%= singular_name %>, :<%= attribute.name %> %>
-      <%% end %>
+        <%% end %>
+      </div>
+    </div>
+  <% end -%>
+  <div class="row">
+    <div class="<%= options[:full_width] ? 'col-md-12' : 'col-md-6' %>">
+      <%%= label_tag :created_at, Spree.t(:created_at) %>
+      <%%= content_tag(:div, pretty_time(f.object.created_at)) if f.object.created_at.present? %>
+    </div>
+    <div class="<%= options[:full_width] ? 'col-md-12' : 'col-md-6' %>">
+      <%%= label_tag :updated_at, Spree.t(:updated_at) %>
+      <%%= content_tag(:div, pretty_time(f.object.updated_at)) if f.object.updated_at.present? %>
     </div>
   </div>
-<% end -%>
 </div>
 
 
 <%- @nested_hash.keys.each do |nested| -%>
-<div data-hook="admin_<%= singular_name %>_<%=nested%>_form_fields">
-  <%%= f.label :<%= nested %>, I18n.t("activerecord.attributes.spree/<%=singular_name%>.<%=nested%>") %>
-  <span id="new_add_<%=nested.singularize%>">
-      <%%= link_to_with_icon('plus', Spree.t("scaffold.add_sub_item"), 'javascript:', :data => {:target => "<%=nested%>"}, :class => 'spree_add_sub_fields button fa fa-plus') %>
+  <div data-hook="admin_<%= singular_name %>_<%= nested %>_form_fields">
+    <%%= f.label :<%= nested %>, I18n.t("activerecord.attributes.spree/<%= singular_name %>.<%= nested %>") %>
+    <span id="new_add_<%= nested.singularize %>">
+      <%%= link_to_with_icon('plus', Spree.t("scaffold.add_sub_item"), 'javascript:', :data => {:target => "<%= nested %>
+      "}, :class => 'spree_add_sub_fields button fa fa-plus') %>
   </span>
-  <table class="index table-condensed table-bordered sortable table" data-sortable-link="<%%= <%= "update_positions_admin_#{nested}_url" %> %>">
-    <thead data-hook="<%=nested.singularize%>_header">
+    <table class="index table-condensed table-bordered sortable table" data-sortable-link="<%%= <%= "update_positions_admin_#{nested}_url" %> %>">
+      <thead data-hook="<%= nested.singularize %>_header">
       <tr>
-<%- if @nested_hash[nested].present? -%>
-      <%- if @nested_hash[nested].map{|h| h[:name]}.include?("position") -%>
-        <th class="no-border"></th>
-      <%- end -%>
-  <%- @nested_hash[nested].each do |hash| -%>
-    <%- if hash[:type] == :polymorphic -%>
-    <%- elsif hash[:name]  != 'position' && hash[:name]  != "#{singular_name}_id" -%>
-        <th>
-          <%%= label_tag I18n.t(:<%=hash[:name] %>, :scope => 'activerecord.attributes.spree/<%=nested.singularize%>') %><%=hash[:presence] ? '<abbr style="color: red">*</abbr>' : ''%>
-        </th>
-    <%- end -%>
-  <%- end -%>
-<%- end -%>
+        <%- if @nested_hash[nested].present? -%>
+          <%- if @nested_hash[nested].map { |h| h[:name] }.include?("position") -%>
+            <th class="no-border"></th>
+          <%- end -%>
+          <%- @nested_hash[nested].each do |hash| -%>
+            <%- if hash[:type] == :polymorphic -%>
+            <%- elsif hash[:name] != 'position' && hash[:name] != "#{singular_name}_id" -%>
+              <th>
+                <%%= label_tag I18n.t(:<%= hash[:name] %>, :scope =>
+                'activerecord.attributes.spree/<%= nested.singularize %>')
+                %><%= hash[:presence] ? '<abbr style="color: red">*</abbr>' : '' %>
+              </th>
+            <%- end -%>
+          <%- end -%>
+        <%- end -%>
         <th class="actions"></th>
       </tr>
-    </thead>
-    <tbody id="<%=nested%>-tbody">
-    <%%= f.fields_for :<%=nested%> do |<%=nested%>_form| %>
-      <tr id="<%%=<%=nested%>_form.object.new_record? ? "<%=nested%>-template" : spree_dom_id(<%=nested%>_form.object)%>" class="<%%= cycle('odd', 'even') %> <%%=<%=nested%>_form.object.new_record? ? "nested-template" : ""%>">
-<%- if @nested_hash[nested].present? -%>
-      <%- if @nested_hash[nested].map{|h| h[:name]}.include?("position") -%>
-        <td>
-        <%% if f.object.id %>
-          <span class="icon icon-move handle"></span>
-        <%% end %>
-        </td>
-      <%- end -%>
-  <%- @nested_hash[nested].each do |hash| -%>
-    <%- if hash[:name] == "#{singular_name}_id" || hash[:name] == 'position' -%>
-    <%- elsif hash[:enum] -%>
-        <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.select :<%= hash[:name] %>, options_for_select(Spree::<%=nested.singularize.camelcase%>.<%=hash[:name].pluralize%>.keys.map{|k| [I18n.t("activerecord.attributes.spree/<%=nested.singularize%>.<%=hash[:name].pluralize%>.#{k}"), k]}, <%=nested%>_form.object.<%=hash[:name]%>), {<%=options[:presence].include?(hash[:name]) ? "" : "include_blank: true"%>}, {class: 'form-control'} %></td>
-    <%- elsif hash[:fk] %>
-        <%- fk_class_name = "Spree::#{hash[:fk].camelcase}" -%>
-        <td data-hook="col-<%= hash[:name] %>">
-          <%%= <%=nested%>_form.hidden_field :<%= hash[:name]  %>, :class => "select2-picker",
-          "data-multiple"=> false,
-          "data-minimum" => <%=options[:select2_minimum] ? options[:select2_minimum] : 3 %>,
-          "data-url" => api_v1_<%= hash[:fk].underscore.pluralize%>_path,
-          "data-name" => <%=fk_class_name%>.column_names.include?("name") ? "name" : "id",
-          "data-query" => <%=fk_class_name%>.column_names.include?("name") ? "name_cont" : "id_eq",
-          "data-objects" => "<%=hash[:fk].underscore.pluralize.pluralize%>"%>
-        </td>
-    <%- elsif hash[:type] == :image || hash[:type] == :file -%>
-        <td data-hook="col-<%= hash[:name] %>">
-          <%- if hash[:type] == :image -%>
-              <%% if <%=nested%>_form.object.<%= hash[:name] %>_file_name %>
-              <div><%%= image_tag <%=nested%>_form.object.<%= hash[:name] %>.url(:mini) -%></div>
-              <%% end %>
-          <%- elsif hash[:type] == :file -%>
-              <%% if <%=nested%>_form.object.<%= hash[:name] %>_file_name %>
-              <div><%%= link_to Spree.t(:download_file), <%=nested%>_form.object.<%= hash[:name] %>.url, target: '_blank' %></div>
-              `<%% end %>
+      </thead>
+      <tbody id="<%= nested %>-tbody">
+      <%%= f.fields_for :<%= nested %> do |<%= nested %>_form| %>
+      <tr id="<%%=<%= nested %>_form.object.new_record? ? "<%= nested %>-template
+      " : spree_dom_id(<%= nested %>_form.object)%>" class="<%%= cycle('odd', 'even') %> <%%=<%= nested %>
+      _form.object.new_record? ? "nested-template" : ""%>">
+      <%- if @nested_hash[nested].present? -%>
+        <%- if @nested_hash[nested].map { |h| h[:name] }.include?("position") -%>
+          <td>
+            <%% if f.object.id %>
+            <span class="icon icon-move handle"></span>
+            <%% end %>
+          </td>
+        <%- end -%>
+        <%- @nested_hash[nested].each do |hash| -%>
+          <%- if hash[:name] == "#{singular_name}_id" || hash[:name] == 'position' -%>
+          <%- elsif hash[:enum] -%>
+            <td data-hook="col-<%= hash[:name] %>"><%%= <%= nested %>_form.select :<%= hash[:name] %>,
+              options_for_select(Spree::<%= nested.singularize.camelcase %>.<%= hash[:name].pluralize %>.keys.map{|k|
+              [I18n.t("activerecord.attributes.spree/<%= nested.singularize %>.<%= hash[:name].pluralize %>.#{k}"),
+              k]}, <%= nested %>_form.object.<%= hash[:name] %>),
+              {<%= options[:presence].include?(hash[:name]) ? "" : "include_blank: true" %>}, {class: 'form-control'} %>
+            </td>
+          <%- elsif hash[:fk] %>
+            <%- fk_class_name = "Spree::#{hash[:fk].camelcase}" -%>
+            <td data-hook="col-<%= hash[:name] %>">
+              <%%= <%= nested %>_form.hidden_field :<%= hash[:name] %>, :class => "select2-picker",
+              "data-multiple"=> false,
+              "data-minimum" => <%= options[:select2_minimum] ? options[:select2_minimum] : 3 %>,
+              "data-url" => api_v1_<%= hash[:fk].underscore.pluralize %>_path,
+              "data-name" => <%= fk_class_name %>.column_names.include?("name") ? "name" : "id",
+              "data-query" => <%= fk_class_name %>.column_names.include?("name") ? "name_cont" : "id_eq",
+              "data-objects" => "<%= hash[:fk].underscore.pluralize.pluralize %>"%>
+            </td>
+          <%- elsif hash[:type] == :image || hash[:type] == :file -%>
+            <td data-hook="col-<%= hash[:name] %>">
+              <%- if hash[:type] == :image -%>
+                <%% if <%= nested %>_form.object.<%= hash[:name] %>_file_name %>
+                <div><%%= image_tag <%= nested %>_form.object.<%= hash[:name] %>.url(:mini) -%></div>
+                <%% end %>
+              <%- elsif hash[:type] == :file -%>
+                <%% if <%= nested %>_form.object.<%= hash[:name] %>_file_name %>
+                <div><%%= link_to Spree.t(:download_file), <%= nested %>_form.object.<%= hash[:name] %>.url, target:
+                  '_blank' %>
+                </div>
+                `<%% end %>
+              <%- end -%>
+              <%%= <%= nested %>_form.file_field :<%= hash[:name] %>, class: 'form-control' %>
+            </td>
+          <%- elsif hash[:type] == :boolean -%>
+            <td data-hook="col-<%= hash[:name] %>">
+              <%%=Spree.t("scaffold.say_yes")%>: <%%= <%= nested %>_form.radio_button :<%= hash[:name] %>, 1, :checked
+              => <%= nested %>_form.object.<%= hash[:name] %> == true %>&nbsp;&nbsp;
+              <%%=Spree.t("scaffold.say_no")%>: <%%= <%= nested %>_form.radio_button :<%= hash[:name] %>, 0, :checked
+              => <%= nested %>_form.object.<%= hash[:name] %> == false %>&nbsp;&nbsp;
+            </td>
+          <%- elsif hash[:type] == :datetime -%>
+            <td data-hook="col-<%= hash[:name] %>"><%%= <%= nested %>_form.text_field :<%= hash[:name] %>, value:
+              datepicker_field_value(<%= nested %>_form.object.<%= hash[:name] %>), class: 'datepicker form-control' %>
+            </td>
+          <%- elsif hash[:type] == :integer -%>
+            <td data-hook="col-<%= hash[:name] %>"><%%= <%= nested %>_form.number_field :<%= hash[:name] %>, class:
+              'form-control', step: 1 %>
+            </td>
+          <%- elsif hash[:type] == :text -%>
+            <td data-hook="col-<%= hash[:name] %>"><%%= <%= nested %>_form.text_area :<%= hash[:name] %>, class:
+              'form-control <%= hash[:html] ? 'tinymce-div' : '' %>' %>
+            </td>
+          <%- elsif hash[:type] == :float -%>
+            <td data-hook="col-<%= hash[:name] %>"><%%= <%= nested %>_form.number_field :<%= hash[:name] %>, class:
+              'form-control' %>
+            </td>
+          <%- elsif hash[:type] == :polymorphic -%>
+          <%- else -%>
+            <td data-hook="col-<%= hash[:name] %>"><%%= <%= nested %>_form.text_field :<%= hash[:name] %>, class:
+              'form-control' %>
+            </td>
           <%- end -%>
-          <%%= <%=nested%>_form.file_field :<%= hash[:name] %>, class: 'form-control' %>
-        </td>
-    <%- elsif hash[:type] == :boolean -%>
-        <td data-hook="col-<%= hash[:name] %>">
-          <%%=Spree.t("scaffold.say_yes")%>: <%%= <%=nested%>_form.radio_button :<%=hash[:name]%>, 1, :checked => <%=nested%>_form.object.<%= hash[:name] %> == true %>&nbsp;&nbsp;
-          <%%=Spree.t("scaffold.say_no")%>: <%%= <%=nested%>_form.radio_button :<%=hash[:name]%>, 0, :checked => <%=nested%>_form.object.<%= hash[:name] %> == false %>&nbsp;&nbsp;
-        </td>
-    <%- elsif hash[:type] == :datetime -%>
-        <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.text_field :<%= hash[:name] %>, value: datepicker_field_value(<%=nested%>_form.object.<%= hash[:name] %>), class: 'datepicker form-control' %></td>
-    <%- elsif hash[:type] == :integer -%>
-        <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control', step: 1 %></td>
-    <%- elsif hash[:type] == :text  -%>
-        <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.text_area :<%= hash[:name] %>,  class: 'form-control <%=hash[:html] ? 'tinymce-div' : ''%>' %></td>
-    <%- elsif hash[:type] == :float -%>
-        <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.number_field :<%= hash[:name] %>,  class: 'form-control' %></td>
-    <%- elsif hash[:type] == :polymorphic -%>
-    <%- else -%>
-        <td data-hook="col-<%= hash[:name] %>"><%%= <%=nested%>_form.text_field :<%= hash[:name] %>,  class: 'form-control' %></td>
-    <%- end -%>
-  <%- end -%>
-<%- end %>
-        <td class="actions">
-          <%%= <%=nested%>_form.hidden_field :id %>
-          <%%= link_to_with_icon('delete', '', '#', :class => "spree_remove_sub_fields btn btn-sm btn-default", :title => Spree.t(:remove)) %>
-        </td>
-    </tr>
-    <%% end %>
-    </tbody>
-  </table>
-</div>
+        <%- end -%>
+      <%- end %>
+      <td class="actions">
+        <%%= <%= nested %>_form.hidden_field :id %>
+        <%%= link_to_with_icon('delete', '', '#', :class => "spree_remove_sub_fields btn btn-sm btn-default", :title =>
+        Spree.t(:remove)) %>
+      </td>
+      </tr>
+      <%% end %>
+      </tbody>
+    </table>
+  </div>
 <% end -%>

@@ -1,5 +1,6 @@
 en:
   spree:
+    created_at: "created at"
     updated_at: "updated at"
     scaffold:
       new: new
