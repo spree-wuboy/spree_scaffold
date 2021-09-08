@@ -11,7 +11,7 @@ module Spree
 <%- if sortable? -%>
     default_scope { order("position asc") }
 <%- else -%>
-    default_scope -> {order("id desc")}
+    default_scope -> {order("#{quoted_table_name}.id desc")}
 <%- end -%>
 <% if sortable? -%>
     acts_as_list
