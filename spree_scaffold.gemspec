@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'wicked_pdf', '1.0.6'
   s.add_dependency 'faker'
   s.add_dependency 'tinymce-rails', '4.9.4'
+  s.add_dependency 'sprockets-rails', '3.2.1'
   s.add_dependency 'paperclip-compression'
   if RUBY_PLATFORM != 'java'
     s.add_dependency 'iconv'
