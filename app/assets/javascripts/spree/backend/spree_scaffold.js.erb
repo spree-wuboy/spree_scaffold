@@ -22,45 +22,42 @@ function removeParameter(url, parameterName) {
     return rtn;
 }
 
-function addParameter(url, parameterName, parameterValue, atStart/*Add param before others*/){
+function addParameter(url, parameterName, parameterValue, atStart/*Add param before others*/) {
     replaceDuplicates = true;
-    if(url.indexOf('#') > 0){
+    if (url.indexOf('#') > 0) {
         var cl = url.indexOf('#');
-        urlhash = url.substring(url.indexOf('#'),url.length);
+        urlhash = url.substring(url.indexOf('#'), url.length);
     } else {
         urlhash = '';
         cl = url.length;
     }
-    sourceUrl = url.substring(0,cl);
+    sourceUrl = url.substring(0, cl);
 
     var urlParts = sourceUrl.split("?");
     var newQueryString = "";
 
-    if (urlParts.length > 1)
-    {
+    if (urlParts.length > 1) {
         var parameters = urlParts[1].split("&");
-        for (var i=0; (i < parameters.length); i++)
-        {
+        for (var i = 0; (i < parameters.length); i++) {
             var parameterParts = parameters[i].split("=");
-            if (!(replaceDuplicates && parameterParts[0] == parameterName))
-            {
+            if (!(replaceDuplicates && parameterParts[0] == parameterName)) {
                 if (newQueryString == "")
                     newQueryString = "?";
                 else
                     newQueryString += "&";
-                newQueryString += parameterParts[0] + "=" + (parameterParts[1]?parameterParts[1]:'');
+                newQueryString += parameterParts[0] + "=" + (parameterParts[1] ? parameterParts[1] : '');
             }
         }
     }
     if (newQueryString == "")
         newQueryString = "?";
 
-    if(atStart){
-        newQueryString = '?'+ parameterName + "=" + parameterValue + (newQueryString.length>1?'&'+newQueryString.substring(1):'');
+    if (atStart) {
+        newQueryString = '?' + parameterName + "=" + parameterValue + (newQueryString.length > 1 ? '&' + newQueryString.substring(1) : '');
     } else {
         if (newQueryString !== "" && newQueryString != '?')
             newQueryString += "&";
-        newQueryString += parameterName + "=" + (parameterValue?parameterValue:'');
+        newQueryString += parameterName + "=" + (parameterValue ? parameterValue : '');
     }
     return urlParts[0] + newQueryString + urlhash;
 };
@@ -70,12 +67,12 @@ $.fn.select2Autocomplete = function (options) {
 
     // Default options
     options = options || {};
-    var multiple = typeof(options.multiple) !== 'undefined' ? options.multiple : true;
+    var multiple = typeof (options.multiple) !== 'undefined' ? options.multiple : true;
 
     function formatSelect2(data) {
         if (options.name.indexOf(".") != -1) {
             var dd = data, names = options.name.split(".");
-            for (var i=0;i<names.length; i++) {
+            for (var i = 0; i < names.length; i++) {
                 dd = dd[names[i]];
             }
             return Select2.util.escapeMarkup(dd || data["id"]);
@@ -85,7 +82,7 @@ $.fn.select2Autocomplete = function (options) {
     }
 
     this.select2({
-        minimumInputLength: options["minimum"]!=='' && options["minimum"]!==undefined ? options["minimum"] : 3,
+        minimumInputLength: options["minimum"] !== '' && options["minimum"] !== undefined ? options["minimum"] : 3,
         multiple: multiple,
         initSelection: function (element, callback) {
             $.get(options.url, {
@@ -122,10 +119,10 @@ $.fn.select2Autocomplete = function (options) {
 
 $(document).ready(function () {
 
-    $(".file-reset").click(function() {
-        var input =$(this).parent().find("input[type=file]")[0] || $(this).parents('div').children("input[type=file]")[0];
+    $(".file-reset").click(function () {
+        var input = $(this).parent().find("input[type=file]")[0] || $(this).parents('div').children("input[type=file]")[0];
         input.value = ''
-        if(!/safari/i.test(navigator.userAgent)){
+        if (!/safari/i.test(navigator.userAgent)) {
             input.type = ''
             input.type = 'file'
         }
@@ -134,16 +131,16 @@ $(document).ready(function () {
     tinymce.init({
         language: 'en',
         selector: ".tinymce-div",
-        plugins: "link advlist code autolink table lists colorpicker insertdatetime wordcount charmap autolink hr anchor pagebreak textcolor responsivefilemanager responsivefilemanager2 youtube localautosave preview mobilepreview",
-        toolbar1: "undo redo |  bullist numlist outdent indent | image media | responsivefilemanager responsivefilemanager2 | youtube | localautosave | preview mobilepreview",
+        plugins: "link advlist code autolink table lists colorpicker insertdatetime wordcount charmap autolink hr anchor pagebreak textcolor responsivefilemanager responsivefilemanager2 media localautosave preview mobilepreview",
+        toolbar1: "undo redo |  bullist numlist outdent indent | image media | responsivefilemanager responsivefilemanager2 | media | localautosave | preview mobilepreview",
         toolbar2: "styleselect | bold italic underline | fontsizeselect forecolor backcolor",
         plugin_preview_width: 1000,
         height: 480,
         relative_urls: false,
         setup: function (ed) {
-            ed.on('keydown',function(e) {
-                if(e.keyCode == 13){
-                    if(ed.dom.hasClass(ed.selection.getNode(), 'youtube')){
+            ed.on('keydown', function (e) {
+                if (e.keyCode == 13) {
+                    if (ed.dom.hasClass(ed.selection.getNode(), 'youtube')) {
                         ed.selection.setContent('<div>&nbsp;</div>');
                         return false;
                     } else {
@@ -152,7 +149,7 @@ $(document).ready(function () {
                 }
             });
             ed.on('init', function () {
-                if($(ed.getElement()).hasClass("tinymce-readonly")) {
+                if ($(ed.getElement()).hasClass("tinymce-readonly")) {
                     ed.getBody().setAttribute('contenteditable', false);
                 }
             });
@@ -161,7 +158,7 @@ $(document).ready(function () {
     });
 
 
-    $('.select2-picker').each(function() {
+    $('.select2-picker').each(function () {
         if ($(this).parents(".nested-template").length == 0) {
             $(this).select2Autocomplete($(this).data());
         }
@@ -193,15 +190,15 @@ $(document).ready(function () {
             el.prop('href', '#');
         })
         appender.append(new_table_row);
-        new_table_row.find('.select2-picker').each(function() {
+        new_table_row.find('.select2-picker').each(function () {
             $(this).select2Autocomplete($(this).data());
         });
 
         // hack for product picker
-        new_table_row.find('.product_picker').each(function() {
+        new_table_row.find('.product_picker').each(function () {
             $(this).productAutocomplete();
         });
-        new_table_row.find('.single_product_picker').each(function() {
+        new_table_row.find('.single_product_picker').each(function () {
             $(this).productAutocomplete({multiple: false});
         });
     });
