@@ -38,7 +38,9 @@ module Spree
       def import
         require 'csv'
         data_list = []
-        CSV.foreach(params[:file].path, :headers => true) do |params|
+        data = File.read(params[:file].path)
+        data=data.force_encoding('utf-8').sub("\xEF\xBB\xBF", '')
+        CSV.parse(data, :headers => true) do |params|
           params = params.map{|k, v| [k.downcase.to_sym,v]}.to_h
           data = model_class.new(params)
           data_list << data
