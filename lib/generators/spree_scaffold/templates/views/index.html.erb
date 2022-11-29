@@ -13,6 +13,10 @@
   <%%= button_link_to "#{Spree.t('scaffold.new')} #{I18n.t("activerecord.models.spree/<%=singular_name%>")}", new_object_url, class: 'btn-success', icon: 'add', id: 'admin-new' if can?(:create, model_class) %>
 <%% end %>
 
+<% if options[:import] %>
+<%%= render 'import' %>
+<% end %>
+
 <%%= render 'search' %>
 
 <%%= render 'spree/admin/shared/index_table_options', collection: @collection %>

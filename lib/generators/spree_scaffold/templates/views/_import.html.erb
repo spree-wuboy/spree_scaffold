@@ -1,0 +1,30 @@
+
+<script>
+    Dropzone.options.import = {
+        maxFiles: 1,
+        createImageThumbnails: false,
+        acceptedFiles: 'text/plain,application/vnd.ms-excel,text/x-csv,application/csv,application/x-csv,text/csv,text/comma-separated-values,text/x-comma-separated-values,text/tab-separated-values',
+        init: function() {
+            this.on("success", file => {
+                this.removeFile(file);
+                window.location.reload();
+            });
+
+            this.on("error", (file, message) => {
+                this.removeFile(file);
+                alert(message);
+            });
+        }
+    }
+</script>
+
+
+<div class="row">
+  <div class="col-md-12">
+    <form id="import" class="dropzone" action="<%%= import_url(:format => 'csv') %>" enctype='multipart/form-data' method="post">
+      <div class="fallback">
+        <input type="file" name="csv"/>
+      </div>
+    </form>
+  </div>
+</div>

@@ -25,6 +25,7 @@ module SpreeScaffold
       class_option :full_width, type: :boolean, default: false, required: false, desc: 'full width form'
       class_option :select2_minimum, type: :string, default: 3, required: false, desc: 'select2 default minimum length for fk'
       class_option :gen, type: :string, required: false, desc: 'generate type, default is false, you can use v(view), m(migration+model), c(controller), o(override). e.g. vm will generate view, model, and migration'
+      class_option :import, type: :boolean, default: false, desc: 'add an import button on collection page'
 
       def self.next_migration_number(path)
         if @prev_migration_nr
@@ -42,8 +43,10 @@ module SpreeScaffold
         if !options[:gen] || options[:gen].include?("m")
           create_nested
           if options[:model_class]
+            template 'core_model.rb', "app/models/#{options[:model_class].split('::')[0].downcase}/core/#{options[:model_class].split('::')[1].downcase}.rb"
             template 'model.rb', "app/models/#{options[:model_class].gsub("::", "/").downcase}.rb" # unless File.exist?("app/models/#{options[:model_class].gsub("::", "/").downcase}.rb")
           else
+            template 'core_model.rb', "app/models/spree/core/#{singular_name}.rb"
             template 'model.rb', "app/models/spree/#{singular_name}.rb" # unless File.exist?("app/models/spree/#{singular_name}.rb")
           end
         end
@@ -68,7 +71,7 @@ module SpreeScaffold
       def create_views
         if !options[:gen] || options[:gen].include?("v")
           create_nested
-          %w[index new edit _form show _object _search].each do |view|
+          %w[index new edit _form show _object _search _import].each do |view|
             template "views/#{view}.html.erb", "app/views/spree/admin/#{plural_name}/#{view}.html.erb"
           end
 
@@ -314,6 +317,7 @@ Spree::Core::Engine.add_routes do
         get :batch
         get :batch_checked
         post :update_positions
+        post :import
       end
       member do
         get :add_checked

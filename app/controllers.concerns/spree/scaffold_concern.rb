@@ -4,7 +4,7 @@ module Spree
 
     included do
       helper_method :batch_url, :batch_check_url, :add_check_url, :checks, :checks=,
-                    :model_class, :session_key
+                    :model_class, :session_key, :import_url
 
       respond_to :html, :json, :pdf
       include ::PdfHelper
@@ -17,6 +17,7 @@ module Spree
       create.fails :add_nested_build
       update.fails :add_nested_build
       before_action :add_user_id, only: [:update, :create]
+      skip_before_action :verify_authenticity_token, only: :import
 
       def index
         respond_to do |format|
@@ -32,6 +33,19 @@ module Spree
                       :disposition => 'inline', :type => "text/csv"
           }
         end
+      end
+
+      def import
+        require 'csv'
+        data_list = []
+        CSV.foreach(params[:file].path, :headers => true) do |params|
+          params = params.map{|k, v| [k.downcase.to_sym,v]}.to_h
+          data = model_class.new(params)
+          data_list << data
+        end
+        model_class.destroy_all
+        model_class.import(data_list)
+        head :ok
       end
 
       def seacher(override_includes=nil)

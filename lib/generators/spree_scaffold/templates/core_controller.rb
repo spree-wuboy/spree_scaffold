@@ -3,8 +3,16 @@ module Spree
     module Core
       class <%= class_name.pluralize %>Controller < ScaffoldController
 
+        def model_class
+          Spree::<%= class_name %>
+        end
+
         def includes
           [<%=options[:fk].keys.map{|fk| ":#{fk}"}.join(",")%>]
+        end
+
+        def import_url(options = {})
+          import_admin_<%=plural_name%>_url(options)
         end
 
         def batch_url(options = {})
@@ -21,7 +29,7 @@ module Spree
 
       <%- if options[:model_class] -%>
         def model_class
-          @model_class = <%=options[:model_class]%>
+          @model_class = <%=options[:model_class] %>
         end
       <%- end -%>
 

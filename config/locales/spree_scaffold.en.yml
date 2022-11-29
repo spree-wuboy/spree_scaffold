@@ -3,6 +3,7 @@ en:
     created_at: "created at"
     updated_at: "updated at"
     scaffold:
+      insert_csv: Drop File here to Import CSV
       new: new
       edit: edit
       list: list
