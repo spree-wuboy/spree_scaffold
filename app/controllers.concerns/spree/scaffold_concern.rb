@@ -46,6 +46,9 @@ module Spree
           data_list << data
         end
         model_class.destroy_all
+        data_list.each do |d|
+          d.run_callbacks(:save) { false }
+        end
         model_class.import(data_list)
         head :ok
       end
