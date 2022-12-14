@@ -38,22 +38,26 @@ module Spree
       def import
         require 'csv'
         data_list = []
-        data = File.read(params[:file].path)
-        data=data.force_encoding('utf-8').sub("\xEF\xBB\xBF", '')
-        CSV.parse(data, :headers => true) do |params|
-          params = params.map{|k, v| [k.downcase.to_sym,v]}.to_h
-          data = model_class.new(params)
-          data_list << data
+        begin
+          data = File.read(params[:file].path)
+          data = data.force_encoding('utf-8').sub("\xEF\xBB\xBF", '')
+          CSV.parse(data, :headers => true) do |params|
+            params = params.map { |k, v| [k.downcase.to_sym, v] }.to_h
+            data = model_class.new(params)
+            data_list << data
+          end
+          model_class.destroy_all
+          data_list.each do |d|
+            d.run_callbacks(:save) { false }
+          end
+          model_class.import(data_list)
+          head :ok
+        rescue Exception => e
+          render plain: e.message, status: 500
         end
-        model_class.destroy_all
-        data_list.each do |d|
-          d.run_callbacks(:save) { false }
-        end
-        model_class.import(data_list)
-        head :ok
       end
 
-      def seacher(override_includes=nil)
+      def seacher(override_includes = nil)
         params[:q] ||= {}
         if !params[:q][:created_at_gt].blank?
           params[:q][:created_at_gt] = Time.zone.parse(params[:q][:created_at_gt]).beginning_of_day rescue ""
@@ -81,8 +85,8 @@ module Spree
           @collection = @search.result(distinct: true)
         else
           @collection = @search.result(distinct: true).
-              page(params[:page]).
-              per(params[:per_page] || SpreeScaffold::Config[:per_page])
+            page(params[:page]).
+            per(params[:per_page] || SpreeScaffold::Config[:per_page])
         end
         @collection
       end
@@ -168,24 +172,24 @@ module Spree
         session[session_key] ||= []
       end
 
-      def render_pdf(name, options={})
-        default_options = {:pdf => name,
-                           :show_as_html => params[:debug],
-                           :layout => "layouts/pdf.pdf",
-                           :margin => {
-                               :top => 20,
-                               :bottom => 20
-                           },
-                           :header => {
-                               :html => {
-                                   :template => 'layouts/header.pdf',
-                               }
-                           },
-                           :footer => {
-                               :html => {
-                                   :template => 'layouts/footer.pdf'
-                               }
-                           }}
+      def render_pdf(name, options = {})
+        default_options = { :pdf => name,
+                            :show_as_html => params[:debug],
+                            :layout => "layouts/pdf.pdf",
+                            :margin => {
+                              :top => 20,
+                              :bottom => 20
+                            },
+                            :header => {
+                              :html => {
+                                :template => 'layouts/header.pdf',
+                              }
+                            },
+                            :footer => {
+                              :html => {
+                                :template => 'layouts/footer.pdf'
+                              }
+                            } }
         default_options.merge(options)
         render_with_wicked_pdf(default_options)
       end
