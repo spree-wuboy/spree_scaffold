@@ -23,9 +23,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'tinymce-rails', '4.9.4'
   s.add_dependency 'sprockets-rails'
   s.add_dependency 'paperclip-compression'
-  if RUBY_PLATFORM != 'java'
-    s.add_dependency 'iconv'
-  end
 
   s.add_development_dependency 'capybara', '~> 2.1'
   s.add_development_dependency 'coffee-rails'
